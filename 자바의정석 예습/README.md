@@ -294,8 +294,99 @@ long add(long a, int b) - math3.add(3L, 3) 결과 : 6
 long add(long a, long b) - math3.add(3L, 3L) 결과 : 6
 int add(int[] a) - math3.add(a) 결과 : 600
 ```
-
+ 
 > 동일한 기능을 하는 메서드를 하나의 이름으로 정의함으로써 오류를 줄여주고, 메서드의 이름만 보고 예측 가능함.
 
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">생성자</summary>
+<div markdown="1">
+
+### 생성자
+
+* 인스턴스가 생성될 때 호출되는 인스턴스 초기화 메서드.
+* 이름이 클래스 이름과 같아야함.
+* 모든 클래스는 반드시 생성자를 가짐. (컴파일러가 생성자가 하나도 없을 떄 자동으로 만들어줌)
+* 리턴 값이 없음.
+
+```
+클래스 이름(타입 변수명, 타입 변수명, ...){
+    // 인스턴스 생성 시 수행될 코드
+    // 주로 인스턴스 변수의 초기화 코드 적음.
+}
+```
+
+```java
+class Car{
+	
+	String color;
+	String gearType;
+	int door;
+	
+	Car(){
+		System.out.println("기본 생성자 호출");
+	}
+	
+	Car(String c, String g, int d){
+		System.out.println("매개변수 생성자호출");
+		color = c;
+		gearType = g;
+		door = d;
+	}
+}
+public class Constructors {
+
+	public static void main(String[] args) {
+		
+		Car car1 = new Car();
+		
+		car1.color = "white";
+		car1.gearType = "auto";
+		car1.door = 4;
+		
+		Car car2 = new Car("black", "auto", 2);
+		
+		System.out.println("car1 color = " + car1.color + ", car1 gear = " + car1.gearType + ", car1 door = " + car1.door);
+		System.out.println("car2 color = " + car2.color + ", car2 gear = " + car2.gearType + ", car2 door = " + car2.door);
+	}
+}
+```
+
+```
+기본 생성자 호출
+매개변수 생성자호출
+car1 color = white, car1 gear = auto, car1 door = 4
+car2 color = black, car2 gear = auto, car2 door = 2
+```
+
+* car1 객체에는 기본 생성자를 생성, car2 객체에는 매개변수가 있는 생성자를 생성.
+* 보통은 car2의 생성자를 객체로써 사용함.
+
+#### 생성자 this
+
+* 인스턴스 자신을 가리키는 참조변수 
+
+```java
+Car(String color, String gearType, int door){
+		this.color = color;
+		this.gearType = gearType;
+		this.door = door;
+	}
+```
+
+* this.color 는 Car에서 정의한 인스턴스변수, String color는 매개변수로 지역변수에 해당함.
+* 생성자의 매개변수로 인스턴스변수들의 초기값을 제공받는 경우가 많기 때문에 이렇게 쓰임.
+
+```java
+	Car(String c, String g, int d){
+		color = c;
+		gearType = g;
+		door = d;
+	}
+```
+
+* 위의 예제처럼 매개변수의 이름을 다르게 하는 것 보다 this를 사용해서 구별하는 것이 의미가 명확함.
 </div>
 </details>
