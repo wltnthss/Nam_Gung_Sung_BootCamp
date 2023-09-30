@@ -230,4 +230,72 @@ main() : x = 1000
 </div>
 </details>
 
+<details>
+<summary style="font-size:20px">오버 로딩</summary>
+<div markdown="1">
 
+### 오버로딩
+
+* 한 클래스 안에 같은 이름의 메서드를 여러 개 정의하는 것.
+* 오버로딩 조건
+  1. 매서드 이름이 같아야함
+  2. 매개변수의 개수 or 타입이 달라야함
+  3. 반환 타입은 관계없음.
+
+```java
+public class Overloading {
+
+	public static void main(String[] args) {
+		
+		MyMath3 math3 = new MyMath3();
+		System.out.println("math3.add(3, 3) 결과 : " + math3.add(3, 3));
+		System.out.println("math3.add(3, 3L) 결과 : " + math3.add(3, 3L));
+		System.out.println("math3.add(3L, 3) 결과 : " + math3.add(3L, 3));
+		System.out.println("math3.add(3L, 3L) 결과 : " + math3.add(3L, 3L));
+		
+		int[] a = {100, 200, 300};
+		System.out.println("math3.add(a) 결과 : " + math3.add(a));
+	}
+}
+
+class MyMath3{
+	int add(int a, int b) {
+		System.out.print("int add(int a, int b) - ");
+		return a+b;
+	}
+	long add(int a, long b) {
+		System.out.print("long add(int a, long b) - ");
+		return a+b;
+	}
+	long add(long a, int b) {
+		System.out.print("long add(long a, int b) - ");
+		return a+b;
+	} 
+	long add(long a, long b) {
+		System.out.print("long add(long a, long b) - ");
+		return a+b;
+	}
+	
+	int add(int[] a) {
+		System.out.print("int add(int[] a) - ");
+		int rslt = 0;
+		for(int i=0; i<a.length; i++) {
+			rslt += a[i];
+		}
+		return rslt;
+	}
+}
+```
+
+```
+int add(int a, int b) - math3.add(3, 3) 결과 : 6
+long add(int a, long b) - math3.add(3, 3L) 결과 : 6
+long add(long a, int b) - math3.add(3L, 3) 결과 : 6
+long add(long a, long b) - math3.add(3L, 3L) 결과 : 6
+int add(int[] a) - math3.add(a) 결과 : 600
+```
+
+> 동일한 기능을 하는 메서드를 하나의 이름으로 정의함으로써 오류를 줄여주고, 메서드의 이름만 보고 예측 가능함.
+
+</div>
+</details>
