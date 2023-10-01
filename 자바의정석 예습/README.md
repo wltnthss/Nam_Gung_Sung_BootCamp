@@ -390,3 +390,132 @@ Car(String color, String gearType, int door){
 * 위의 예제처럼 매개변수의 이름을 다르게 하는 것 보다 this를 사용해서 구별하는 것이 의미가 명확함.
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">상속</summary>
+<div markdown="1">
+
+### 상속
+
+* 기존의 클래스로 새로운 클래스를 작성하는 것.
+* 두 클래스를 부모와 자식으로 관계를 맺어주는 것.
+* 상속을 통해 보다 적은 양의 코드로 새로운 코드를 작성하고, 공통적으로 관리하여 유지보수에 용이함.
+
+```java
+class 자식클래스 extends 부모클래스 {
+	...
+}
+
+class Parent{
+	...
+}
+
+class Child extends Parent{
+	...	
+}
+```
+
+* 상속해주는 클래스(Parent)를 부모 클래스라고 하고, 상속 받는 클래스(Child)를 자식 클래스라고함.
+* 자식 클래스 Child는 부모 클래스 Parent를 포함할 수 있다고도함.
+* 부모 클래스가 변경되면 자식 클래스는 영향을 받지만, 자식 클래스가 변경되는 것은 부모 클래스에 영향을 주지 않음.
+* 자식 클래스는 부모 클래스의 모든 멤버를 상속받지만 생성자와 초기화 블럭은 상속되지 않음.
+* 자식 클래스의 멤버 개수는 부모 클래스보다 항상 같거나 많음.
+
+```java
+public class Ex7_1 {
+
+	public static void main(String[] args) {
+		
+		SmartTv stv = new SmartTv();
+		stv.channel = 10;
+		stv.channelUp();
+		System.out.println(stv.channel);
+		
+		stv.displayCaption("자바의정석 상속 이 부분은 안나올거임");
+		stv.caption = true;
+		stv.displayCaption("자바의정석 상속");
+	}
+}
+
+class Tv{
+	
+	boolean power;
+	int channel;
+	
+	void power() {
+		power = !power;
+	}
+	
+	void channelUp() {
+		channel++;
+	}
+	
+	void channelDown() {
+		channel--;
+	}
+}
+
+class SmartTv extends Tv{
+	
+	boolean caption;
+	
+	void displayCaption(String text) {
+		if(caption) {
+			System.out.println(text);
+		}
+	}
+}
+```
+
+* 자식 클래스의 인스턴스를 생성하면 부모 클래스의 멤버도 같이 생성되기 때문에 부모 클래스의 인스턴스 생성없이 사용가능함.
+
+#### 상속은 언제 사용?
+
+* 클래스를 설계할 때 상속을 쓰는 경우는 어떠한 경우가 있을까?
+
+```java
+//1
+class Circle{
+	Point c = new Point();
+	int r;
+}
+
+class Circle extends Point{
+	int r;
+}
+```
+
+* 위의 경우를 보았을 때 Circle클래스를 작성할 때 Point클래스를 포함시키거나 상속받는거는 별 차이 없어보임.
+* 이러한 경우 ~은 ~이다 (is a), ~은 ~을 가지고 있다 (has a) 을 활용하자.
+
+> 원은 점이다 - Circle is a Point
+
+> 원은 점을 가지고 있다. - Circle has a Point
+
+* 원은 점을 가지고 있다. has a 관계가 더 어울리므로 이러한 경우는 상속보다는 포함관계가 더 알맞음.
+
+* 상속관계 is a 인 경우 Car와 SportsCar 를 예로 들어보자.
+* SportsCar는 Car이다. 라는 문장이 어울리는 경우 Car를 부모클래스로 두어 상속관계를 맺는 것이 알맞음.
+
+* 자바에서는 단일 상속만을 허용함.
+* 다중상속을 허용하면 복합적인 기능을 가진 클래스를 쉽게 작성할 수 있다는 장점이 있지만, 관계가 복잡해짐.
+* 비중이 높은 클래스 하나만 상속관계로, 나머지는 포함관계로 작성함.
+
+#### Object 클래스
+
+```java
+class Tv{
+
+}
+
+class Tv extends Object{
+
+}
+```
+
+* 부모가 없는 클래스는 자동적으로 Object 클래스를 상속받음.
+* 모든 클래스는 Object클래스에 정의된 11개의 메서드를 상속받음.
+* 상속계층도 최상위에는 Object 클래스가 위치함.
+
+</div>
+</details>
