@@ -780,3 +780,157 @@ public class Time {
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">다형성</summary>
+<div markdown="1">
+
+### 다형성
+
+* 여러 가지 형태를 가질 수 있는 능력.
+* **부모 타입 참조 변수로 자식 타입 객체를 다루는 것.**
+
+```java
+class Tv{
+	
+	boolean power;
+	int channel;
+	
+	void power() { power = !power; }
+	
+	void channelUp() { channel++; }
+	
+	void channelDown() { channel--; }
+}
+
+class SmartTv extends Tv{
+	
+	String text;
+	boolean caption;
+	
+	void displayCaption(String text) {
+		if(caption) {
+			System.out.println(text);
+		}
+	}
+}
+
+	public static void main(String[] args) {
+		
+		// 다형성 미활용
+		Tv t = new Tv();
+		SmartTv stv = new SmartTv();
+	}
+```
+
+* 다형성을 활용하기전에는 main에서 보듯이 인스턴스의 타입과 일치하는 타입의 참조변수만을 사용함.
+* 부모는 부모의 인스턴스변수, 메서드를 사용, 자식은 부모, 자신의 인스턴스변수, 메서드에 접근하여 사용할 수 있었음.
+
+* 다형성을 활용하면 아래와 같이 사용할 수 있음.
+  
+```java
+public static void main(String[] args) {
+		
+		// 다형성 활용
+		Tv tv = new SmartTv();
+	}
+```
+* 부모 클래스의 타입 참조변수로 자식 클래스의 타입 인스턴스를 참조함.
+
+#### 다형성 장점과 예제
+
+```java
+SmartTv stv = new SmartTv();
+```
+
+* 다형성을 사용하지 않았을 경우.
+* SmartTv의 참조변수 객체 stv는 Tv의 기능 5개와 SmartTv 클래스 내에서의 기능 3개로 총 8개가 이용가능함.
+  
+```java
+	//Tv
+	boolean power;
+	int channel;
+	void power() { power = !power; }
+	void channelUp() { channel++; }
+	void channelDown() { channel--; }
+	
+	//SmartTv
+	String text;
+	boolean caption;
+	void displayCaption(String text) {
+		if(caption) {
+			System.out.println(text);
+		}
+	}
+```
+
+```java
+Tv tv = new SmartTv();
+```
+
+* 다형성을 사용했을 경우
+* 부모클래스의 참조변수 객체 tv로 SmartTv 의 인스턴스를 만들었을때 인스턴스 기능은 8개지만 Tv의 기능 5개만 사용가능함.
+
+#### 다형성 예제
+
+```java
+class Coffee {
+    int price;
+
+    public Coffee(int price) {
+        this.price = price;
+    }
+}
+
+class Americano extends Coffee {
+    public Americano() {
+        super(4000); // 상위 메서드 생성자 호출
+    }
+    // Object 클래스 toString() 메서드 오버라이딩
+    public String toString() { 
+        return "아메리카노";
+    }
+}
+
+class CaffeLatte extends Coffee {
+    public CaffeLatte() {
+        super(5000);
+    }
+    // Object 클래스 toString() 메서드 오버라이딩
+    public String toString() {
+        return "카페라떼";
+    }
+}
+
+class Customer {
+    int money = 50000;
+
+    // 커피 구매 메서드(다형성 활용)
+    void buyCoffee(Coffee coffee) {
+        if (money < coffee.price) {
+            System.out.println("잔액이 부족합니다.");
+            return;
+        }
+        money -= coffee.price;
+        System.out.println(coffee + "를 구매하였습니다.");
+    }
+
+    /* 아메리카노, 카페라떼 구매 메서드를 따로 구현하지 않아도 됨
+    void buyCoffee(Americano americano) {
+        money -= americano.price;
+    }
+
+    void buyCoffee(CaffeLatte caffeLatte) {
+        money -= caffeLatte.price;
+    } */
+}
+```
+
+* 개별적인 커피 구매 메서드를 따로 구현하지 않아도, 상위 클래스의 Coffee의 자료형만 매개변수로 받아 사용가능함.
+
+* 장점
+  1.  유지보수 용이 : 여러 객체를 하나의 타입으로 관리 가능.
+  2.  재사용성 : 부모 클래스를 만들어놓음으로써 재사용성이 높아짐.
+
+</div>
+</details>
