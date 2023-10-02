@@ -511,11 +511,173 @@ class Tv{
 class Tv extends Object{
 
 }
+
+Tv tv = new Tv();
+
+public static void main(String[] args) {
+	tv.toString();
+	tv.equals();
+}
+
 ```
 
 * 부모가 없는 클래스는 자동적으로 Object 클래스를 상속받음.
-* 모든 클래스는 Object클래스에 정의된 11개의 메서드를 상속받음.
+* 모든 클래스는 Object클래스에 정의된 11개의 메서드를 상속받음. (toString, equals 등등..)
 * 상속계층도 최상위에는 Object 클래스가 위치함.
+
+#### 참조변수 super
+
+* super는 자식 클래스에서 부모 클래스로부터 상속받은 멤버를 참조하는데 사용되는 참조변수임.
+
+```java
+public class Super {
+	
+	public static void main(String[] args) {
+		
+		Child child = new Child();
+		child.method();
+	}
+}
+
+class Parent{
+	int x = 10;
+}
+
+class Child extends Parent{
+	int x = 20;
+	
+	public void method() {
+		System.out.println("x = " + x);
+		System.out.println("this.x = " + this.x);
+		System.out.println("super.x = " + super.x);
+	}
+}
+```
+
+* 위의 예제와 같이 자식 Child 클래스는 부모 Parent 클래스로부터 x를 상속받는데, x값이 같아서 구분할 방법이 필요함.
+* 이럴 때 부모 클래스의 멤버를 참조하는 경우 super 키워드를 사용함.
+
+```java
+public class Super {
+	
+	public static void main(String[] args) {
+		
+		Child child = new Child(1, 2, 3);
+		System.out.println(child.toString());
+		
+		System.out.println();
+		
+		Parent parent = new Parent(5, 6);
+		System.out.println(parent.toString());
+	}
+}
+
+class Parent{
+	int x, y;
+	
+	Parent(int x, int y){
+		this.x = x;
+		this.y = y;
+		System.out.println("Super 생성자 호출");
+	}
+	
+	public String toString() {
+		return x + "," + y;
+	}
+}
+
+class Child extends Parent{
+	
+	int z;
+	
+	Child(int x, int y, int z) {
+		super(x, y);
+		this.z = z;
+		System.out.println("Child 생성자 호출");
+	}
+	
+	@Override
+	public String toString() {
+		return x + "," + y + "," + z; 
+	}
+}
+```
+
+```
+Super 생성자 호출
+Child 생성자 호출
+1,2,3
+
+Super 생성자 호출
+5,6
+
+```
+
+* 자식 클래스인 Child에서 Parent로부터 상속받은 x,y를 초기화함.
+* child 객체를 생성할 때 Child 생성자에서 super 호출을 통해 Parent의 생성자가 호출되며 Super생성자 호출, Child 생성자 호출이됨.
+* child에서 오버라이딩한 toString을 통해 1,2,3 이 출력되고 생성자도 동일한 로직으로 호출이됨.
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">오버라이딩</summary>
+<div markdown="1">
+
+* 부모 클래스로부터 상속받은 메서드의 내용을 변경하는 것.
+* 선언부는 바꾸지 못하고 구현부만 바꿀 수 있음.
+* 오버라이딩 조건
+  * 메서드의 선언부(메서드 이름, 매개변수, 반환타입)은 부모클래스와 자식클래스가 일치해야함.
+  * 접근 제어자는 부모 클래스의 메서드보다 좁은 범위로 변경 할 수 없음.(부모가 protected 이면 자식은 protected or public 이어야함.)
+  * 부모 클래스의 메서드보다 많은 수의 예외처리를 선언할 수 없음.
+
+```java
+public class Extends {
+
+	public static void main(String[] args) {
+		
+		Point p1 = new Point();
+		p1.x = 10;
+		p1.y = 20;
+		p1.getLocation();
+		
+		Point3D p2 = new Point3D();
+		p2.x = 5;
+		p2.y = 10;
+		p2.z = 20;
+		p2.getLocation();
+		
+		System.out.println(p1.getLocation());
+		System.out.println(p2.getLocation());
+		
+	}
+}
+
+class Point{
+	int x;
+	int y;
+	
+	public String getLocation() {
+		return "x : " + x + ", y : " + y;
+	}
+}
+
+class Point3D extends Point{
+	
+	int z;
+	
+	@Override
+	public String getLocation() {
+		return "x : " + x + ", y : " + y + ", z : " + z;
+	}
+	
+}
+```
+
+* Point3D는 Point로 부터 x,y 상속받고 getLocation() 메서드를 사용중임.
+* 부모클래스에서 사용하는 getLocation() 메서드를 그대로 사용할 수도 있지만 자식 클래스에 변경하여 사용가능함.
+* 왜 사용할까?
+  * 부모클래스 Point 에서 getLocation 이 좌표를 가져다주는 기능을 사용했듯이 자식 클래스에서도 좌표를 문자열로 얻을 수 있다는 기대값이 있으므로 새로운 메서드를 제공하는 것 보다 오버라이딩을 통해 메서드의 기능을 유추하고 유지보수에 용이하다는 장점이 있음.
 
 </div>
 </details>
