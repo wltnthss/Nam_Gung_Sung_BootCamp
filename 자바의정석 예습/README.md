@@ -591,7 +591,7 @@ class Child extends Parent{
 	int z;
 	
 	Child(int x, int y, int z) {
-		super(x, y);
+		super(x, y);		// super(x,y) 는 매개변수가 있는 Parent 의 생성자를 호출함. Parent 기본 생성자가 있으면 this.x, this.y 사용 가능.
 		this.z = z;
 		System.out.println("Child 생성자 호출");
 	}
@@ -678,6 +678,105 @@ class Point3D extends Point{
 * 부모클래스에서 사용하는 getLocation() 메서드를 그대로 사용할 수도 있지만 자식 클래스에 변경하여 사용가능함.
 * 왜 사용할까?
   * 부모클래스 Point 에서 getLocation 이 좌표를 가져다주는 기능을 사용했듯이 자식 클래스에서도 좌표를 문자열로 얻을 수 있다는 기대값이 있으므로 새로운 메서드를 제공하는 것 보다 오버라이딩을 통해 메서드의 기능을 유추하고 유지보수에 용이하다는 장점이 있음.
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">제어자, 접근제어자, 캡슐화</summary>
+<div markdown="1">
+
+### 제어자 
+
+* 클래스와 클래스의 멤버(멤버 변수, 메서드)에 부가적인 의미 부여
+  * 접근 제어자 - public, protected, (deault), private
+  * 그 외 - static, final, abstract, native, transient, synchronized, volatile, stictfp
+
+* 주로 클래스나 멤버변수와 메서드에 사용됨.
+* 하나의 대상에 여러 제어자를 같이 사용가능하나 접근 제어자는 하나만 사용 가능함.
+* 접근 제어자를 가장 왼쪽에 사용함.
+
+#### static 
+
+* 클래스의, 공통적인 이라는 의미를 가지고 있으며 인스턴스에 상관없이 같은 값을 가지고있음.
+* 멤버변수, 메서드, 초기화 블럭에 사용됨.
+* 클래스가 메모리에 로드될 때 생성됨.
+* 인스턴스를 생성하지 않고도 사용 가능함.
+* static 메서드 내에서는 인스턴스변수들을 직접 사용할 수 없다.
+  * 인스턴스 변수는 객체가 생성되어야 사용가능한데 static은 객체 생성없이 사용 가능하여 호출시기가 다르기 때문임.
+
+#### final
+
+* 마지막의, 변경될 수 없는 의미를 가지고 있으며, 거의 모든 대상에 사용 가능함.
+* 변수에 사용하면 변경할 수 없는 상수가 되며, 메서드에 사용하면 오버라이딩을 할 수 없고, 클래스에 사용되면 부모 클래스가 될 수 없음.
+
+### 접근 제어자
+
+![Alt text](image-1.png)
+
+* 접근 제어자는 멤버, 메서드, 생성자 또는 클래스에 사용되며 클래스를 외부에서 접근하지 못하도록 제한하는 역할을 함.
+
+1. private - 같은 클래스 내에서만 접근이 가능함.
+2. (deault) - 같은 패키지 내에서만 접근이 가능함.
+3. protected - 같은 패키지 내에서, 그리고 다른 패키지의 자식클래스에서 접근이 가능함.
+4. public - 접근 제한이 없음.
+
+* public > protected > default > private 순으로 나열함. 
+* 접근제한없음 > 같은 패키지 + 자식클래스 > 같은 패키지 > 같은 클래스
+
+### 캡술화와 접근 제어자
+
+* public protected, default, private 접근 제어자는 왜 사용할까?
+  * **외부로부터 데이터를 보호하기 위함**
+  * 외부에는 불필요한, 내부적으로 사용되는 부분을 감추기 위함
+
+```java
+public class Time{
+	public int hour;
+	public int minute;
+	public int second;
+}
+
+public static void main (String[] args) {
+	Time t = new Time();
+	t.hour = 25;		// 멤버변수에 직접 접근이 가능함.
+}
+```
+
+* 위의 예제로보면 멤버변수 hour는 0보다 같거나 크고 24보다 작은 범위의 같을 가져야함.
+* 하지만 위의 코드에서 25로 잘못지정해도 막을 방법이 없기에 주로 private 제한하고 getter, setter로써 값은 가져옴.
+
+```java
+public class Time {
+
+	private int hour;
+	private int minute;
+	private int second;
+	
+	public int getHour() {
+		return hour;
+	}
+	public void setHour(int hour) {
+		this.hour = hour;
+	}
+	public int getMinute() {
+		return minute;
+	}
+	public void setMinute(int minute) {
+		this.minute = minute;
+	}
+	public int getSecond() {
+		return second;
+	}
+	public void setSecond(int second) {
+		this.second = second;
+	}
+}
+```
+
+* get은 단순히 멤버변수의 값은 반환하며, set은 조건에 맞는 값일 때 멤버변수의 값을 변경함.
+* **만일 상속을 통해 확장될 것이 예상되는 클래스인 경우는 private 대신 protected를 사용하는 것.**
+* private 이 붙은 멤버는 자식 클래스에서도 접근이 불가능하기 때문임.
 
 </div>
 </details>
