@@ -931,12 +931,12 @@ class Customer {
 * 장점
   1.  유지보수 용이 : 여러 객체를 하나의 타입으로 관리 가능.
   2.  재사용성 : 부모 클래스를 만들어놓음으로써 재사용성이 높아짐.
-
+ 
 </div>
 </details>
 
 <details>
-<summary style="font-size:20px">참조변수의 형변환</summary>
+<summary style="font-size:20px">참조변수의 형변환, instanceof 연산자</summary>
 <div markdown="1">
 
 
@@ -960,6 +960,32 @@ public class CarMain {
 * Car 의 참조변수 c는 f에 있는 주소를 참조함. (이 때 Car가 부모클래스이므로 형변환 생략이 가능함) 참조변수 c는 water 메서드는 사용 불가능함.
 * FireEngine 의 참조변수 f2에는 f, c와 같은 메모리 주소를 참고하고있음. (이 때 자식클래스인 FireEngine타입으로 형변환은 생략이 불가능함.) 
 * 상속관계가 아니면 당연히 클래스 간의 형변환은 불가함.
+
+### instanceof 연산자
+
+* 참조변수의 형변환 가능여부 확인에 사용하며 가능하면 true를 반환함.
+* 참조변수 형변환을 할 떄는 형변환 여부를 먼저 파악한 후에 형변환을 하는 것이 바람직함.
+
+```java
+public class CarMain {
+
+	public static void main(String[] args) {
+		
+		FireEngine f = new FireEngine();
+		
+		System.out.println(f instanceof Car);			// true
+		System.out.println(f instanceof FireEngine);	// true
+		System.out.println(f instanceof Object);		// true
+		
+	}
+}
+```
+
+* 자기 자신도 참이 나오지만 부모클래스, 조상클래스에 대해서도 참 결과가 나오며 이는 형변환이 가능하다는 것임.
+* 참조변수의 형변환은 왜 해야될까?
+	* 참조변수를 변경함으로써 사용할 수 있는 멤버의 갯수를 조절하기 위함.
+* instanceof 연산자는 언제 사용할까?
+	* 참조변수를 형변환하기 전에 형변환 사용가능여부를 판단하기 위함.
 
 </div>
 </details>
