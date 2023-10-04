@@ -934,3 +934,32 @@ class Customer {
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">참조변수의 형변환</summary>
+<div markdown="1">
+
+
+### 참조변수의 형변환
+
+```java
+public class CarMain {
+
+	public static void main(String[] args) {
+		
+		FireEngine f = new FireEngine();
+		Car c = f;						// 부모 Car타입 형변환 (생략가능)
+		FireEngine f2 = (FireEngine)c;	// 자식인 FireEngine 타입으로 형변환 (생략불가), 컴파일 에러는 안나지만 실행시 에러가 남.
+		Ambulance a = (Ambulance)f;		// 상속관계까 아닌 클래스 간은 형변환 불가.
+	}
+}
+```
+
+* FireEngine, Ambulance 는 Car를 상속받음.
+* FireEngine 의 참조변수 f 에는 FireEngine 객체 생성한 주소를 담음.
+* Car 의 참조변수 c는 f에 있는 주소를 참조함. (이 때 Car가 부모클래스이므로 형변환 생략이 가능함) 참조변수 c는 water 메서드는 사용 불가능함.
+* FireEngine 의 참조변수 f2에는 f, c와 같은 메모리 주소를 참고하고있음. (이 때 자식클래스인 FireEngine타입으로 형변환은 생략이 불가능함.) 
+* 상속관계가 아니면 당연히 클래스 간의 형변환은 불가함.
+
+</div>
+</details>
