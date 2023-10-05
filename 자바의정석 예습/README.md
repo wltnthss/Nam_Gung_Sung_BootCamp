@@ -1042,3 +1042,176 @@ public class CarMain {
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">추상 클래스</summary>
+<div markdown="1">
+
+### 추상클래스
+
+* 클래스가 객체의 묶음으로 사용하는 설계도라면 추상 클래스는 미완성 설계도에 비유할 수 있음.
+* 미완성 설계도로 완성된 제품을 만들 수 없듯이 추상 클래스로 인스턴스는 생성할 수 없음.
+
+```java
+abstract class Player{	// 추상 클래스 (미완성 클래스)
+
+	boolean pause; 					// 추상 클래스도 변수를 가질 수 있음.
+	int cuirrentPos;				// 추상 클래스도 변수를 가질 수 있음.
+
+	Player(){						// 추상 클래스도 생성자가 있어야함.
+		pause = false;
+		currentPos = 0;
+	}
+
+	abstract void play(int pos);	// 추상 메서드(몸통이 없는 미완성 메서드)
+	abstract void stop();			// 추상 메서드
+}
+
+Player p = new Player();  			// X, 에러남. 추상 클래스의 인스턴스는 생성 불가능.
+```
+
+* abstract가 붙은 class에는 abstract가 붙은 메서드가 있다고 생각할 수 있음.
+* 추상메서드가 있으니 상속을 통해서 구현해주어야 하는 것을 알 수 있음.
+
+```java
+class AudioPlayer extends Player{
+	void play(int pos){ ... }		// 추상 메서드 구현
+	void stop() { ... }				// 추상 메서드 구현
+}
+
+AudioPlayer ap = new AudioPlayer();	// 상속을 통한 추상 클래스 객체 생성은 가능함.
+```
+
+* 상속을 통해 추상 메서드를 완성해야 인스턴스 생성 가능함.
+* 추상클래스 왜 사용할까?
+  * 꼭 필요하지만 자식클래스마다 다르게 구현될 것으로 예상하는 경우 사용함.
+  * 새로운 클래스를 작성하는데 있어 아무 것도 없는 상태에서 시작하는 것보다는 틀을 갖춰서 시작하기 위함.
+  * ex) 같은 크기 TV라도 기능에 따라서 모델이 여러 개 있지만, 설계도 90%정도는 동일시함.
+  * 서로 다른 세 개 설계도를 그리는 것보다는 공통부분만 그린 미완성 설계도를 만들어 놓고, 이것을 이용해 완성하는 것이 효율적.
+
+```java
+abstract class AbstractPlayer extends Player{	// play, stop 두 가지 메서드 중 하나만 구현한 경우
+	void play(int pos){ ... }
+}
+```
+
+* 추상 클래스를 상속할 때 메서드를 두 개다 구현해야만 생각할 수 있음.
+* 하지만 abstract 를 붙이면 미완성 클래스이므로 둘 중 하나만 구현하여 사용할 수도 있음.
+
+#### 추상클래스 작성
+
+* 추상클래스는 공통적으로 사용될 수 있는 클래스를 작성하기도 하고, 기존 클래스에서 공통적인 부분을 뽑아 추상클래스로 만들어 상속하기도 함.
+* 추상클래스 예제를 통해 알아보자.
+
+```java
+package ch7;
+
+public class AbstractTest {
+
+	public static void main(String[] args) {
+		
+		Unit[] unit = { new Marin(), new Tank(), new Dropship()};
+		
+		for (int i = 0; i < unit.length; i++) {
+			unit[i].move(100, 200);
+		}
+		
+		Marin marin = new Marin();
+		marin.stimPack();
+		
+		Tank tank = new Tank();
+		tank.changeMode();
+		
+		Dropship dropship = new Dropship();
+		dropship.load();
+		dropship.unload();
+
+	}
+}
+
+abstract class Unit {
+	int x, y;
+	abstract void move(int x, int y);
+	void stop() {};
+}
+
+class Marin extends Unit{
+	void move(int x, int y) {
+		System.out.println("Marine x = " + x + ", y = " + y);
+	}
+	void stimPack() {
+		System.out.println("Marin 스팀팩 사용");
+	}
+}
+
+class Tank extends Unit{
+	void move(int x, int y) {
+		System.out.println("Tank x = " + x + ", y = " + y);
+	}
+	void changeMode() {
+		System.out.println("Tank 모드 변경");
+	}
+}
+
+class Dropship extends Unit{
+	void move(int x, int y) {
+		System.out.println("Dropship x = " + x + ", y = " + y);
+	}
+	void load() {
+		System.out.println("Dropship 유닛 태우기");
+	}
+	void unload() {
+		System.out.println("Dropship 유닛 내리기");
+	}
+}
+```
+
+```
+Marine x = 100, y = 200
+Tank x = 100, y = 200
+Dropship x = 100, y = 200
+Marin 스팀팩 사용
+Tank 모드 변경
+Dropship 유닛 태우기
+Dropship 유닛 내리기
+```
+
+* 공통부모인 Unit 클래스 타입의 객체 배열을 통해 서로 다른 종류의 인스턴스를 하나의 묶음으로 다룸.
+* 부모 클래스 Unit의 참조변수 unit을 통해 자손 타입의 인스턴스를 참조하므로 위와 같이 사용할 수 있음.
+* 만약 최상위 Object 클래스에서 사용하고자하면 move메서드가 정의되지 않았기에 사용불가함.
+
+#### 추상화된 코드의 장점
+
+* 추상화된 코드는 구체화된 코드보다 유연함. (변경에 유리함)
+
+```java
+GregorianCalendar cal = new GregorianCalendar();	// 구체적
+Calendar cal = Calendar.getInstance();				// 추상적
+
+public static Calendar getInstance(Local aLocal){
+	return createCalendar(TimeZone.getDefault(), aLocal);
+}
+
+private static Calendar createCalendar(Timezone zone, Local aLocale){
+	//...
+	if(caltype != null){
+		switch(caltype){
+			case "buddhist":
+				cal = new BuddhistCalendar(zone, aLocal);
+				break;
+			case "japanese":
+				cal = new JapaneseImperialCalendar(zone, aLocal);
+				break;
+			case "gregory":
+				cal = new GregorianCalendar(zone, aLocal);
+				break;
+		}
+	}
+}
+```
+
+* 구체적으로 명시한 GregorianCalendar의 객체 cal은 하드코딩임. 다 고쳐야되는 문제점이 있음.
+* 하지만 추상적으로 유연한 코드를 작성하면 코드를 건드리지않고 추가만하면되는 장점이 있음.
+
+</div>
+</details>
