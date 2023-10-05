@@ -927,18 +927,71 @@ class Customer {
 ```
 
 * 개별적인 커피 구매 메서드를 따로 구현하지 않아도, 상위 클래스의 Coffee의 자료형만 매개변수로 받아 사용가능함.
-
-* 장점
-  1.  유지보수 용이 : 여러 객체를 하나의 타입으로 관리 가능.
-  2.  재사용성 : 부모 클래스를 만들어놓음으로써 재사용성이 높아짐.
+* 밑의 예제를 하나 더 알아보자.
  
+### 매개변수의 다형성
+
+* 참조형 매개변수는 메서드 호출시, 자신과 같은 타입 또는 자식타입의 인스턴스를 넘겨줄 수 있음.
+
+```java
+public class Tv1 extends Product{
+	
+	public Tv1() {
+		super(100);
+	}
+	
+	public String toString() {
+		return "tv";
+	}
+}
+
+public class Buyer {
+
+	int money = 1000;
+	int bonusPoint = 0;
+	
+	void buy(Product p) {
+		
+		if(money < p.price) {
+			System.out.println("잔액이 부족하여 물건 구매X");
+			return;
+		}
+		money -= p.price;
+		bonusPoint += p.bonusPoint;
+		System.out.println(p + "을/를 구입하셨습니다.");
+	}
+}
+
+public static void main(String[] args) {
+	Buyer customer1 = new Buyer();
+
+	customer1.buy(new Tv1());
+
+	System.out.println("customer1 현재 남은 돈은 " + customer1.money + " 만원 입니다.");
+	System.out.println("customer1 현재 보너스 점수는 " + customer1.bonusPoint + " 점 입니다.");
+}
+
+```
+
+```
+tv을/를 구입하셨습니다.
+customer1 현재 남은 돈은 900 만원 입니다.
+customer1 현재 보너스 점수는 10 점 입니다.
+```
+
+* 구매자 cutomer1을 객체로 만들어 cutomer1이 buy 메서드를 사용하고 있는 예제.
+* customer1.buy(new Tv1()); 의 의미는 아래와 같음.
+  * Product p = new Tv1();
+  * customer1.buy(p);
+* Tv객체를 만들고 p에 담아서 사용하는 것과 직접 Tv객체를 만들어 넣어주는 것과 같음. 헷갈리지 말자.
+* 위의 예제 처럼 매개변수의 다형성은 buy 메서드 하나로만 사용하여 자식 클래스들이 사용가능한 유지보수의 용이성을 가지고 있음.
+  
 </div>
 </details>
 
 <details>
 <summary style="font-size:20px">참조변수의 형변환, instanceof 연산자</summary>
 <div markdown="1">
-
 
 ### 참조변수의 형변환
 
