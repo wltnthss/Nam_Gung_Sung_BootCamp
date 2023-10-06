@@ -1441,9 +1441,169 @@ interface MyInterface2{
 ```
 
 * newMethod() 기능을 새로 구현하고자하면 implements 했던 클래스들 모두 구현해야하기에
-* 구현부, 선언부를 사용가능한 default void newMethod() { ... } 를 통해 구현하면 새로운 추상 메서들르 구현하지않고 사용가능함.
+* 구현부, 선언부를 사용가능한 default void newMethod() { ... } 를 통해 구현하면 새로운 추상 메서드를 구현하지않고 사용가능함.
 * 디폴트 메서드와 부모 클래스간의 충돌이 일어나면 부모 클래스의 메서드가 상속되고, 디폴트 메서드는 무시됨.
 * **충돌났을 때는 오버라이딩 하자.**
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">내부 클래스, 익명 클래스</summary>
+<div markdown="1">
+
+### 내부 클래스
+
+* 내부 클래스는 클래스 내에 선언된 클래스
+* 클래스에 다른 클래스를 선언하는 이유는 두 클래스가 긴밀한 관계에 있기 때문임.
+* 두 클래스의 멤버들 간에 쉽게 접근할 수 있고 불필요한 클래스를 감춤으로써 코드 복잡성을 줄일 수 있음.(캡슐화에 유리함)
+
+```java
+class A{	// 외부 클래스
+
+	class B{	// 내부 클래스
+		... // 객체 생성 없이도 A의 멤버에 접근 가능함.
+	}
+}
+```
+
+* B는 A의 내부 클래스 (inner class) 임.
+* 내부 클래스 B는 외부 클래스 A를 제외하고 다른 클래스에서는 잘 사용되지 않는 것이어야함.
+
+```java
+package ch7;
+
+class AA{	// AA는 BB의 외부 클래스
+	int i = 5;
+	BB b = new BB();
+	class BB{	// BB는 AA의 내부 클래스
+		void method() {
+//			AA a = new AA();
+//			System.out.println(a.i);
+			System.out.println(i); 		// 객체 생성없이 외부 클래스 멤버 접근가능.
+		}
+	}
+}
+class CC{
+	
+//	BB b = new BB();	BB는 직접 접근 불가함. AA의 내부 클래스에 있으므로
+}
+public class InnterTest {
+
+	public static void main(String[] args) {
+//		BB b = new BB();
+//		b.method();
+		AA a = new AA();
+		a.b.method();
+	}
+
+}
+```
+
+* BB 클래스를 AA의 내부 클래스로서 사용할 때 AA클래스의 객체 a를 만들어 a에 있는 b의 객체를 사용가능함.
+
+#### 내부 클래스의 종류와 특징
+
+```java
+class Outer{
+	int iv = 0;
+	static int cv = 0;
+
+	void myMethod(){
+		int lv = 0;
+	}
+}
+
+class Outer{
+	class InstanceInner {}
+	static class StaticInner {}
+
+	void myMethod(){
+		class LocalInner {}
+	}
+}
+```
+
+* 내부 클래스의 종류는 변수의 선언위치에 따른 종류와 같음.
+* 변수를 선언하는 것과 같은 위치에 선언가능하며, 선언위치에 따라 인스턴스 변수, 클래스 변수로 나뉨.
+* 내부 클래스는 네 종류가 있음.
+  * 인스턴스 클래스 : 외부 클래스의 멤버 변수 선언위치에 선언함. 
+  * 스태틱 클래스 : 외부 클래스의 static 멤버처럼 다루어짐.
+  * 지역 클래스 : 외부 클래스의 메서드나 초기화 블럭 안에 선언됨.
+  * 익명 클래스 : 일회용으로 사용하는 이름 없는 클래스
+
+* 내부 클래스 역할은 변수의 특징과 유사함 (iv, cv, lv)
+
+#### 내부 클래스의 제어자와 접근성
+
+* 내부 클래스의 제어자는 변수에 사용 가능한 제어자와 동일함.
+
+```java
+class Outer{
+	private class InstanceInner {}
+	protected static class StaticInner {}
+
+	void myMethod() {
+		class LocalInner {}
+	}
+}
+```
+
+* 내부 클래스에서도 public, default, private, protected 전부 동일하게 사용가능함.
+* 내부 클래스에서 static 멤버가 필요하면 내부 클래스를 static class 로 작성하면됨.
+* 상수인경우에는 final static 으로 사용가능함.
+* 내부 클래스에서는 외부 클래스의 private 멤버도 접근 가능함.
+* 외부 클래스의 지역변수는 final이 붙은 상수만 접근 가능함.(JDK 1.8부터는 값이 안바뀌는 변수도 상수로 간주함)
+  * 값이 바뀌지 않는 전제하에 final이 안붙어도 에러가 안남. (왠만하면 final 붙이자) 
+
+### 익명 클래스
+
+* 다른 내부 클래스들과 달리 이름이 없는 클래스
+* 클래스의 선언과 객체의 생성을 동시에 하기 때문에 한번만 사용가능한 일회용 클래스임.
+
+```java
+new 부모클래스이름(){
+	// 멤버 선언
+}
+
+new 구현인터페이스이름(){
+	// 멤버 선언
+}
+```
+
+* 익명 클래스는 이름이 없으므로 생성자를 가질 수 없으며, 상속받는 동시에 인터페이스를 구현할 수 없음.
+* 오로지 단 하나의 클래스를 상속받거나 단 하나의 인터페이스만 구현 가능함.
+
+#### 익명 클래스 예제
+
+```java
+
+class EventHandler implements ActionListener{
+	public void actionPerformed(ActionEvent e) {
+		System.out.println("ActionEvent occurred");
+	}
+}
+
+public class anonymousTest {
+
+	public static void main(String[] args) {
+
+		Button b = new Button("Start");
+		b.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("ActionEvent occurred");
+			}
+		});
+	}
+
+}
+```
+
+* 위의 EventHandler 의 조상클래스인 ActionListener 를 익명클래스로써 구현한 것이 밑의 예제임.
+* EventHadnler 라는 클래스를 일회용으로써 사용한다면 아래와 같이 익명클래스로써 구현하는 것이 코드의 간결화에 유리함.
+* 익명 클래스는 람다에서도 다시 다루니 알고만 넘어가자.
 
 </div>
 </details>
