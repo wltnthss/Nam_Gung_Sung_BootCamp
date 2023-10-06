@@ -1215,3 +1215,235 @@ private static Calendar createCalendar(Timezone zone, Local aLocale){
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">인터페이스</summary>
+<div markdown="1">
+
+### 인터페이스
+
+* 추상 클래스는 추상 메서드를 가지고 있으나 인터페이스는 추상 메서드만 가질 수 있음. (상수도 가능)
+* 인터페이스는 일종의 추상클래스라고도 하며 추상 클래스보다 추상화 정도가 높음.(추상 메서드의 집합이라고도 함)
+* 추상 클래스와 달리 추상메서드와 상수만을 멤버로 가질 수 있음.
+* 추상 클래스가 미완성 설계도라면 인터페이스는 밑그림만 있는 기본 설계도라고 할 수 있음.
+* 모든 변수는 public (생략 가능), 상수만 올 수 있으며 구현부는 없고 선언부만 존재함.
+* 인터페이스는 **추상 메서드의 집합이며 껍데기라고 알아두자.**
+
+```java
+interface Playground{
+	publiuc static final int SPADE = 4;
+	final int DIAMOND = 3;						// public static final int DIAMOND = 3;
+	static int HEART = 2;						// public static final int HEART = 2;
+	int CLOVER = 1;								// public static final int CLOVER = 1;
+
+	public abstract String getCardNumber();
+	String getCardKind();						// public abstract String getCardKind();
+}
+```
+
+* 인터페이스는 모든 제어자가 public이며 편의성을 위해 생략 가능함.
+* 상수는 static final 이 붙음.
+* 인터페이스의 조상은 인터페이스만 가능함.(Object가 최고 조상이 아님)
+* 다중 상속이 가능함. 추상 메서드는 선언부만 존재하므로 충돌해도 문제 없음
+
+#### 인터페이스 구현
+
+```java
+class 클래스이름 implements 인터페이스이름{
+	// 인터페이스에 정의된 추상메서드를 모두 구현해야함.
+}
+
+interface Fightable{
+	void move(int x, int y);
+	void attack(Unit u);
+}
+
+class Fighter implements Fightable{
+	public void move(int x, int y) { ... };
+	public void attack(Unit u) { ... };
+}
+
+// 추상 클래스와 마찬가지로 일부만 구현하는 경우, 클래스 앞에 abstract 를 붙여야함.
+abstract class Fighter implements Fightable{
+	public void move(int x, int y) { ... };
+}
+```
+
+* 추상 클래스는 상속을 통해서 사용하지만, 인터페이스는 implements 를 통해서 구현함.
+* 추상 클래스와 동일하게 일부의 메서드만 구현하고자 한다면 앞에 abstract 를 붙여서 사용함.
+
+> 인터페이스 vs 추상클래스
+>
+> 인터페이스는 추상클래스보다 좀 더 추상화된 개념이며 인스턴스 변수, 생성자를 가질 수 없는 추상 메서드의 집합이며, 다중상속이 가능함.
+
+#### 인터페이스를 이용한 다형성
+
+* 부모 참조변수로 자식 객체를 가리키는 것이 다형성 ex) Tv t = new SmartTv();
+* 인터페이스도 인터페이스 타입의 참조변수로 클래스의 인스턴스를 참조할 수 있으며 형변환도 가능함.
+
+```java
+class Fighter extends Unit implements Fightable{
+	public void move(int x, int y) { .... };
+	public void attack(Fightable f) { ... };
+}
+
+interface Fightable{
+	void move(int x, int y);
+	void attack(Fightable f);
+}
+
+Unit u = new Fighter();			// 부모 클래스 자손객체 참조
+Fightable f = new Fighter();	// 인터페이스 자손객체 참조
+
+f.move(100, 200);
+f.attack(new Fighter());
+```
+
+* 참조변수 f를 사용할 떄에는 인터페이스에 선언해놓은 추상메서드만 사용가능함.
+* **매개변수 타입이 인터페이스라는 것은 Fightable 인터페이스를 구현한 클래스의 인스턴스만 참조가능.**
+* 인터페이스를 메서드의 리턴타입으로 지정할 수 있음.
+
+```java 
+Fightable method(){
+	Fighter f = new Fighter();
+	return f; 	
+	// return new Fighter(); 와 같은 의미
+}
+```
+
+* Fightable 인터페이스를 구현한 클래스의 인스턴스를 반환.
+* 즉, 메서드의 반환타입이 인터페이스임.
+  * 이것은 인터페이스 구현한 객체를 반환해야함.
+  * 매서드를 호출하는 쪽에서는 반환타입과 일치하는 타입을 사용해야함.
+  * 리턴타입이 인터페이스라는 것은 메서드가 해당 인터페이스를 구현한 클래스의 인스턴스를 반환하는 것을 의미함.
+
+#### 인터페이스 장점
+
+* 두 대상간의 연결, 대화, 소통을 돕는 중간 역할을 함. 
+* 개발시간이 단축 가능함 - 메서드의 내용과 관계없이 선언부만 알면 프로그램 작성이 가능함.
+* 독립적인 프로그래밍이 가능함 - 클래스의 선언과 구현을 분리함으로써 간접적인 관계로 변경하여 변경이 다른 클래스에 영향을 미치지 않음.
+
+```java
+class B{
+	public void method(){
+		System.out.println("methodB");
+	}
+}
+```
+
+* 위와 같이 껍데기 + 알맹이로 선언부와 구현부를 사용한 class B를 인터페이스를 이용했을 때
+
+```java
+interFace I{
+	public void method();
+}
+
+class B implements I{
+	public void method(){
+		System.out.println("methodB");
+	}
+}
+```
+
+* 새로운 interface I를 만듬으로써 method() 를 선언부만 떼어네어 추상메서드로 구현함.
+* 이렇게 했을 때 B 클래스가 I를 구현함으로써 선언부와 구현부를 분리하여 유연한 프로그래밍을 도와줌.
+* 새로운 A 클래스가 들어와도 껍데기를 일치하게 사용함으로써 코드의 재사용성을 높여줌. (느슨한 결합)
+   
+#### 인터페이스 다형성 예제 
+
+```java
+class A{
+	public void method(B b) {
+		b.method();
+	}
+}
+
+class B{
+	public void method() {
+		System.out.println("B클래스 메서드");
+	}
+}
+
+class C{
+	public void method() {
+		System.out.println("C클래스 메서드");
+	}
+}
+
+public class InterFaceTest {
+
+	public static void main(String[] args) {
+		
+		A a = new A();
+		a.method(new B());	// A가 B를 사용(의존 관계) C를 사용할 때 A와 B를 둘 다 수정해야함.
+	}
+}
+```
+
+* 클래스 A와 B가 있고 A는 B의 객체를 참조변수로 사용하며, method에는 B의 메서드를 호출하고있음.
+* 이 때 클래스 C를 사용한다하면 클래스 A에 있는 B의 참조형 매개변수를 C로 고쳐야함. 
+  
+```java
+package ch7;
+
+class A{
+	public void method(I i) {
+		i.method();
+	}
+}
+// B 클래스 선언과 구현을 분리함.
+interface I{
+	public void method();
+}
+
+class B implements I{
+	public void method() {
+		System.out.println("B클래스 메서드");
+	}
+}
+
+class C implements I{
+	public void method() {
+		System.out.println("C클래스 메서드");
+	}
+}
+
+public class InterFaceTest {
+
+	public static void main(String[] args) {
+		
+		A a = new A();
+		a.method(new C());
+	}
+}
+```
+
+* 코드를 위와 같이 바꾸어주면 class A는 interface i의 method를 호출하게됨.
+* main에서 a의 객체에서 참조형 매개변수로 new C() 를 호출하므로 
+* c의 인스턴스 주소가 호출되고 c에 있는 method 함수를 호출하게되어 C클래스 메서드가 출력됨.
+
+#### 인터페이스의 디폴트 메서드와 static 메서드
+
+* 인터페이스에 디폴트 메서드, static 메서드 기능 추가(JDK 1.8 부터)
+* 인터페이스에 새로운 메서드를 추가하기 어려운 문제를 보완하고자 만들어짐.
+  * 기능 새로 추가시 기존에 구현했던 클래스들 모두 구현해야한다는 단점을 dafult method를 통해 구현하자.
+
+```java
+interface MyInterface{
+	void method();
+	void newMethod();	// 추상 메서드
+}
+
+interface MyInterface2{
+	void method();
+	default void newMethod() { ... }
+}
+```
+
+* newMethod() 기능을 새로 구현하고자하면 implements 했던 클래스들 모두 구현해야하기에
+* 구현부, 선언부를 사용가능한 default void newMethod() { ... } 를 통해 구현하면 새로운 추상 메서들르 구현하지않고 사용가능함.
+* 디폴트 메서드와 부모 클래스간의 충돌이 일어나면 부모 클래스의 메서드가 상속되고, 디폴트 메서드는 무시됨.
+* **충돌났을 때는 오버라이딩 하자.**
+
+</div>
+</details>
