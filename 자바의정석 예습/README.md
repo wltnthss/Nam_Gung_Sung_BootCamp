@@ -1607,3 +1607,273 @@ public class anonymousTest {
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">예외 처리</summary>
+<div markdown="1">
+
+### 프로그램 오류 
+
+* 프로그램 오류는 총 3가지로 나뉨.
+  * 컴파일 에러 : 컴파일 시에 발생하는 에러 (자바 컴파일러가 구문체크, 번역, 최적화를 해줌)
+  * 런타임 에러 : 실행 시에 발생하는 에러, 런타임 에러의 종류가 두 가지
+    * 에러 : 프로그램 코드에 의해서 수습될 수 없는 심각한 오류 (OutofMemoryError, StackOverflowError)..
+    * 예외 : 프로그램 코드에 의해서 수습될 수 있는 미약한 오류 (Exception.. RuntimeException..)
+  * 논리적 에러 : 실행은 되지만, 의도와 다르게 동작하는 것
+
+#### 예외처리의 정의와 목적
+
+* 정의 : 프로그램 실행 시 발생할 수 있는 예외의 발생에 대비한 코드 작성.
+* 목적 : 프로그램의 비정상적 종료를 막고, 정상적인 실행상태 유지.
+
+### 예외 클래스의 계층 구조
+
+![Alt text](image-2.png)
+
+* 위 그림은 실행 시 발생할 수 있는 오류를 클래스로 정의한 그림임.
+* 모든 클래스의 조상은 Object 이고, Exception, Error 클래스 또한 자식 클래스들임.
+
+![Alt text](image-3.png)
+
+* 모든 예외의 최고 조상은 Exception 클래스라는 상속계층도.
+* RuntimeException 도 Exception 의 자식에 속함.
+* Exception 클래스들과 자식들은 사용자의 실수와 같은 외적인 요인에 의해 발생하는 예외.
+* RuntimeException 클래스들과 자식들은 프로그래머의 실수로 발생하는 예외.
+
+### 예외 처리 try-catch 문
+
+* 프로그램 런타임시 에러는 어쩔 수 없는 문제이고, 예외는 프로그래머가 처리가 가능한 부분임.
+* 예외처리란 프로그램 실행 시 발생할 수 있는 예기치 못한 **예외의 발생에 대비한 코드를 작성**하는 것.
+
+```java
+public class ExceptionTest {
+
+	public static void main(String[] args) {
+		
+		System.out.println(1);
+		System.out.println(2);
+		try {
+			System.out.println(3);
+			System.out.println(0/0);
+			System.out.println(4);
+		} catch (ArithmeticException ae) {
+			if(ae instanceof ArithmeticException) {
+				System.out.println("true");
+			}
+			System.out.println("ArithmeticException!!");
+		} catch(Exception e) {
+			System.out.println("Exeption!!");
+		}
+		System.out.println(6);
+	}
+}
+```
+```
+1
+2
+3
+true
+ArithmeticException!!
+6
+```
+
+* 1, 2 출력 -> try문 3 까지 출력 후 0/0 으로 나누면 ArithmeticException 이 발생함.
+* 4는 출력되지않고 catch 문에서 차례로 이동하며 맨 위에 ArithmeticException 이 발생했으므로 실행시키고
+* Exception 의 catch 문은 실행시키지 않고 6을 출력하고 프로그램이 종료됨.
+* Exception 은 최고 조상인 클래스이므로 제일 마지막 catch 블럭에 모든 예외처리를 진행해줌.
+
+### printStackTrace() 와 getMessage()
+
+* 예외가 발생했을 때 생성되는 예외 클래스의 인스턴스에는 발생한 예외에 대한 정보가 담겨 있음
+* 이는 자주 사용되는 getMessage() 와 printStackTrace() 를 통해서 정보들을 얻을 수 있음.
+
+* printStackTrace() - 예외발생시 호출 스택에 있던 **메서드의 정보와 예외 메시지**를 화면에 출력함
+* getMessage() - 발생한 예외클래스의 인스턴스에 저장된 메시지를 얻을 수 있음
+
+### 멀티 catch 블럭
+
+* catch 블럭을 | 기호를 사용하여 하나의 catch 블럭으로 합치는 것.
+* JDK 1.7부터 가능함.
+
+```java
+try{
+	catch (Exception A | Exception B e){
+		e.printStackTrace();
+	}
+}
+```
+
+* 예외 클래스가 부모 자식 관계에 있으면 컴파일 에러 발생함.
+* 부모 클래스의 예외만 써주는 것과 동일하기 때문에 불필요한 자식 클래스 예외는 제거하라는 뜻.
+
+### 예외 발생시키기
+
+```java
+public class Ex8_6 {
+	public static void main(String[] args) {
+		
+		try {
+//			Exception e = new Exception("고의로 에러 발생시킴");
+//			throw e;
+			
+			throw new Exception("고의로 에러 발생2");
+		} catch (Exception e) {
+			System.out.println("에러 메시지 : " + e.getMessage());
+			e.printStackTrace();
+		}
+		System.out.println("프로그램 정상 종료");
+	}
+}
+```
+
+* 고의로 예외를 발생시킬 수 있는 방법도 존재함.
+  * Exception e = new Exception("예외 메시지 입력 방법1");
+  * throw e; 
+  * 
+  * throw new Exception("예외 메시지 입력 방법2")
+
+### 메서드에 예외 선언하기
+
+```java
+void method() throws Exception1, Exception2 ... { ... };
+
+void method() throws Exception { ... }	// 이 메서드는 모든 종류의 예외가 발생할 가능성이 있음.
+```
+
+* try-catch는 직접처리, 메서드 예외 선언은 예외를 떠넘기는 것.
+* 예외를 처리하기 위해선 try-catch문을 사용하는 것이 일반적이지만 메서드에 선언하는 방법도 있음.
+* 예외가 여러 개인 경우에는 쉼표로 구분하여 여러 개 적는 것도 가능함.
+* 모든 예외의 최고 조상인 Exception 을 메서드에 선언하면 이 메서드는 모든 종류의 예외가 발생할 가능성이 있음.
+
+```java
+public class Ex8_6{
+	public static void main(String[] args) throws Exception{
+		method1();
+	}
+	
+	static void method1() throws Exception{
+		method2();
+	}
+	
+	static void method2() throws Exception{
+		throw new Exception();
+	}
+}
+```
+```
+Exception in thread "main" java.lang.Exception
+	at ch8.Ex8_6.method2(Ex8_6.java:14)
+	at ch8.Ex8_6.method1(Ex8_6.java:10)
+	at ch8.Ex8_6.main(Ex8_6.java:6)
+
+```
+
+* 메서드 호출 과정
+  1. method2() 에서 throw new Exception() 문장으로 인해 예외가 강제적으로 발생했음.
+  2. try-catch 문으로 예외처리를 하지 않았으므로, method2() 는 종료되며 자신을 호출한 method1() 에게 넘김.
+  3. method1() 에서도 예외처리를 하지 않았으므로, 종료되면서 main에게 예외를 넘겨줌.
+  4. main 메서드에서도 예외처리를 하지 않았으므로, main 메서드가 종료되며 프로그램이 비정상적으로 종료됨.
+
+* 위의 예제 처럼 예외가 발생한 메서드에서 예외처리를 하지 않고 자신을 호출한 메서드에게 넘겨줄 수는 있지만,
+* 이것으로 예외가 처리된 것은 아니고 단순히 전달만 하는 것임. 
+* 결국 어느 한 곳에서는 반드시 try-catch 문으로 예외처리를 해주어야함.
+* 예외가 선언되어 있으면 Exception 과 같은 checked(컴파일시 오류가 나는 에러) 예외는 try-catch 문으로 처리 하지 않아도 컴파일 에러가 발생하지 않음.
+
+### 메서드 예외 선언하기 예제2
+
+```java
+package ch8;
+
+import java.io.File;
+
+public class Ex8_10 {
+
+	public static void main(String[] args) {
+
+		try {
+			File f = createFile(args[0]);
+			System.out.println( f.getName() + " 파일이 성공적 생성");
+		} catch (Exception e) {
+			System.out.println(e.getMessage() + " 다시 입력");
+		}
+	}
+	
+	static File createFile(String fileName) throws Exception {
+		
+		if(fileName == null || fileName.equals("")) {
+			throw new Exception("파일이름이 유효하지 않음.");
+		}
+		File f = new File(fileName);
+		f.createNewFile();
+		return f;
+	}
+
+}
+```
+```
+파일이름이 유효하지 않음. 다시 입력
+```
+
+* args[0] 에 null이나 "" 을 입력하고 파일 생성 시에 if문에서 예외가 발생 
+* main문의 catch문으로 이동하여 결과와 같은 내용이 출력됨.
+
+### finally 블럭
+
+```java
+try{
+	// 예외가 발생할 가능성이 있는 문장
+}catch(Exception e){
+	// 예외 처리 문장
+}finally{
+	// 예외의 발생여부에 관계없이 항상 수행되는 문장
+	// finally는 try catch문의 맨 마지막에 위치해야함.
+}
+```
+
+* try 블럭 안에 return 문이 있어서 try 블럭을 벗어나갈 때도 finally 블럭이 실행됨.
+* 임시파일을 삭제하는 메서드가 여러 개인 경우, 이 때 finally 문에서 하나 적어줌으로써 코드중복을 제거함.
+
+### 사용자 정의 예외 만들기
+
+* 기존에 정의된 예외 클래스 외에 필요에 따라 프로그래머가 새로운 예외 클래스를 정의하여 사용 가능함.
+* 보통은 Exception 클래스 또는 RuntimeException 클래스로부터 상속받는 클래스를 만듬.
+* Exception 은 사용자가 발생시키는 예외, RuntimeException 은 프로그래머의 실수로 발생시키는 예외
+* 선택처리 unchekced가 가능한 RuntimeException 을 사용하고 Exception은 chekced 필수처리이므로 사용을 지양하자.
+
+```java
+class MyException extends Exception {
+	MyException(String msg){	// 문자열을 매개변수로 받는 생성자
+		super(msg);				// 조상인 Exception 클래스의 생성자 호출
+	}
+}
+```
+
+### 연결된 예외
+
+* 한 예외가 다른 예외를 발생시키는 경우
+* 예외 A가 예외 B를 발생시키면 A를 B의 원인 예외라고 함.
+
+```java
+void install() throws InstallException {
+	try{
+		startInstall();
+		copyFiles();
+	}catch (SpaceException e){
+		InstallException ie = new InstallException("설치중 예외발생");
+		ie.initCause(e);
+		throw ie;
+	}catch (MemoryException me){
+		...
+	}
+}
+```
+
+* startInstall() 메서드에서 저장공간 부족으로 SpaceException 예외 발생.(예외 A라 가정)
+* 새로운 예외 InstallException ie = new InstallException 생성 (예외 B라 가정)
+* 예외B의 원인 예외를 예외A로 지정 하여 예외 B를 발생시킴
+* 연결된 예외는 왜 써야될까?
+  * 여러 예외를 하나로 묶어서 사용할 때
+  * checked 예외를 unchecked 예외로 변경할 때
+
+</div>
+</details>
