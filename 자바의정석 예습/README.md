@@ -2277,7 +2277,7 @@ System.out.println(s.equals(s2));	// true
 		//String substring(int begine, int end) - 시작부터 끝 위치 범위 포함 문자열 
 		System.out.println("java.lang.Object".substring(2,5)); 	// va.
 
-		그 밖에 등등... toLowercase(), toUpperCase(), trime()
+		그 밖에 등등... toLowercase(), toUpperCase(), trim()
 ```
 
 </div>
