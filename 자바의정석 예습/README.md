@@ -1877,3 +1877,408 @@ void install() throws InstallException {
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">java.lang 패키지, util 클래스</summary>
+<div markdown="1">
+
+### java.lang 패키지
+
+* java.lang 패키지는 가장 기본이 되는 클래스들을 포함하여 import문 없이도 사용할 수 있음.
+* java.lang 패키지에서 자주 사용되는 클래스들을 알아보자.
+
+#### Object 클래스
+
+```java
+public boolean equals(Object obj){
+	return;
+}
+```
+
+* Object 클래스는 모든 클래스의 최고 조상이므로 클래스에서 바로 사용가능함.
+* Object 클래스의 equals 메서드는 매개변수로 객체의 참조변수를 받아서 비교하여 결과를 boolean으로 알려 주는 역할.
+* 자주 사용하는 Object 클래스 메서드를 알아보자.
+
+#### Object 클래스 - equals()
+
+```java
+class Value{
+	int value;
+	
+	public Value(int value) {
+		this.value = value;
+	}
+}
+
+public class Ex9_1 {
+
+	public static void main(String[] args) {
+		
+		Value v1 = new Value(10);
+		Value v2 = new Value(10);
+		
+		if(v1.equals(v2)) {
+			System.out.println("v1와 v2는 같습니다.");
+		}else {
+			System.out.println("v1와 v2는 다릅니다.");
+		}
+	}
+}
+```
+
+* equals 메서드는 주소값으로 비교를 하기 때문에 멤버변수값이 10으로 같을지라도 결과는 false임.
+* Object 클래스로부터 상속받은 equals 메서드는 참조변수에 저장된 값이 같은지를 판단하는 기능밖에 할 수 없음.
+* 그렇다면 객체의 주소값을 비교하는게 아니라 value 값을 비교하는게 방법은 어떻게 할까?
+
+#### equals() 오버라이딩
+
+```java
+class Person{
+	
+	long id;
+	
+	public Person(long id) {
+		this.id = id;
+	}
+	
+	public boolean equals(Object obj) {
+		
+		if(obj instanceof Person) {
+			return id == ((Person)obj).id;
+		}else {
+			return false;
+		}
+	}
+}
+
+public class Ex9_2 {
+
+	public static void main(String[] args) {
+		
+		Person p1 = new Person(8011222L);
+		Person p2 = new Person(8011222L);
+		
+		if(p1.equals(p2)) {
+			System.out.println("p1과 p2는 같은 사람입니다.");
+		}else {
+			System.out.println("p1과 p2는 다른 사람입니다.");
+		}
+	}
+}
+```
+
+* equals 메서드가 Person 인스턴스 주소값이 아닌 id를 참고하기 위해 equals 메서드를 오버라이딩함.
+* 서로 다른 인스턴스라도 같은 id를 가지고 있으면 재정의한 equals 메서드로 true 결과를 얻게 할 수 있음.
+
+#### Object 클래스 - hashCode()
+
+```java
+public class Object{
+	public native int hashCode();	// native 란 os가 가지고 있는 메서드
+}
+```
+
+* hashCode() 메서드는 해싱기법에 사용하는 해시함수를 구현한 것임.
+* 객체의 해시코드를 반환하는 메서드
+* 내용이 없으며 객체의 주소를 int로 변환해서 반환해줌.
+* equals()를 오버라이딩하면 hashCode() 도 오버라이딩 해주는게 바람직함.
+* 왜냐하면 equals() 결과가 true인 두 객체의 해시코드가 같아야하기 때문임.
+  
+```java
+	public static void main(String[] args) {
+		String str1 = new String("abc");
+		String str2 = new String("abc");
+		
+		System.out.println(str1.hashCode());
+		System.out.println(str2.hashCode());
+		System.out.println(System.identityHashCode(str1));
+		System.out.println(System.identityHashCode(str2));
+	}
+```
+```
+96354
+96354
+1521118594
+1940030785
+```
+
+* String 클래스는 문자열의 내용이 같으면 동일한 해시코드를 반환하도록 오버라이딩되어있음.
+* 반면에 System.indentityHashCode 는 객체의 주소값으로 해시코드를 생성하기 떄문에 다른 해시코드값을 반환함.
+
+#### Object 클래스 - toString()
+
+```java
+public String toString(){
+	return getClass().getName()+"@"+Ineger.toHexString(hashCode());
+}
+```
+
+* 인스턴스에 대한 정보를 문자열로 제공할 목적으로 정의한 메서드.
+* toString() 메서드를 오버라이딩 하지 않으면 클래스이름과 16진수의 해시코드의 결과값이 나옴.
+
+```java
+import java.util.Objects;
+
+class Card{
+	
+	String kind;
+	int num;
+	
+	public Card() {
+		this("SPADE", 5);
+	}
+
+	public Card(String kind, int num) {
+		this.kind = kind;
+		this.num = num;
+	}
+	
+	@Override
+	public String toString() {
+		return kind + "," + num;
+	}
+	
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Card)) {
+			return false;
+		}
+		Card c = (Card)obj;
+		
+		return this.kind.equals(c.kind) && this.num == c.num;
+	}
+	
+	public int hashCode() {
+		return Objects.hash(kind, num);
+	}
+	
+}
+
+public class Ex9_5 {
+
+	public static void main(String[] args) {
+		
+		Card card1 = new Card();
+		Card card2 = new Card("SPADE", 5);
+		
+		System.out.println(card1);
+		System.out.println(card2);
+		
+		System.out.println(card1.equals(card2));
+		System.out.println(card1.hashCode());
+		System.out.println(card2.hashCode());
+	}
+}
+```
+```
+SPADE,5
+SPADE,5
+true
+-1842861215
+-1842861215
+```
+
+* toString 메서드를 오버라이딩 할 때는 Object 의 접근 제어자보다 같거나 넓어야하기때문에
+* 오버라이딩 할 때 public 으로 했다는 것을 눈 여겨 보자.
+* equals 를 오버라이딩하면 hashCode도 Objects.hash 를 통해서 같은 값이 나와야함.
+
+#### String 클래스
+
+* String 클래스는 문자열을 저장하고 이를 다루는데 필요한 메서드를 함께 제공함.
+* String 클래스 = 데이터(char[]) + 메서드(문자열 관련)
+
+```java
+public final class String implements java.io.Serializable, Comparable {
+	private char[] value;
+	...
+}
+```
+
+```java
+String a = "a";
+String b = "b";
+a = a + b;
+```
+
+* 내용을 변경할 수 없는 불변 클래스
+* 기존 a가 ab로 바뀌는게 아니라 새로운 문자열 ab가 만들어지므로 덧셈 연산자를 통한 문자열 결합은 성능이 떨어짐.
+* 문자열의 결합이나 변경이 잦으면, 내용을 변경가능한 StringBuffer 을 사용하는게 성능이 더 좋음.
+* 반복문을 통해서 문자열을 지속적으로 결합하는 경우에는 StringBuffer 를 사용하자.
+
+### 문자열 비교
+
+* 문자열을 만들 때는 두 가지 방법, 문자열 리터럴을 지정하는 방법과 String 클래스의 생성자를 사용해서 만드는 방법이 있음.
+
+```java
+public class ex9_6 {
+
+	public static void main(String[] args) {
+		
+		String str1 = "abc";
+		String str2 = "abc";
+		
+		System.out.println("str1 == str2 : " + (str1 == str2));
+		System.out.println("str1.equals(str2) : " + str1.equals(str2));
+		
+		String str3 = new String("abc");
+		String str4 = new String("abc");
+		
+		System.out.println("str3 == str4 : " + (str3 == str4));
+		System.out.println("str3.equals(str4) : " + str3.equals(str4));
+	}
+}
+```
+```
+str1 == str2 : true
+str1.equals(str2) : true
+str3 == str4 : false
+str3.equals(str4) : true
+```
+
+* str1과 str2는 문자열 "abc" 를 가르킴. 하나의 문자열을 여러 참조변수가 공유함.
+* str3과 str4는 각각의 문자열 "abc" 를 가르킴. 항상 새로운 문자열이 만들어짐.
+* 문자열 내용비교를 할 때는 equals를 사용하고 주소를 비교 할 때는 == 를 사용하자.
+* 왜 그런지 문자열 리터럴을 통해서 알아보자.
+
+#### 문자열 리터럴
+
+* 프로그램 실행시 자동으로 생성됨. String은 클래스이므로 객체를 생성해야하나 문자열 리터럴은 자동으로 상수 저장소에 만들어짐.(constant pool 에 저장)
+* 같은 내용의 문자열 리터럴은 String 객체이고 하나만 만들어짐. 
+
+```java
+public static void main(String[] args) {
+	String s1 = "AAA";
+	String s2 = "AAA";
+	String s3 = "AAA";
+	String s4 = "BBB";
+}
+```
+![Alt text](image-4.png)
+
+* s1, s2, s3가 만들어진 String 불변의 객체를 공유함.
+* 내용을 변경할 수는 없으므로 하나의 문자열을 여러 참조변수가 공유함.
+  
+#### 문자열 기본형간의 변환
+
+* 숫자 -> 문자
+
+```java
+int i = 100;
+System.out.println(i + "");
+System.out.println(String.valueOf(i));	// 속도가 더 빠름, 성능 향상이 필요할 경우 사용하자.
+```
+
+* 문자 -> 숫자
+
+```java
+System.out.println(Integer.parseInt("100"));
+System.out.println(Integer.valueOf("100"));
+```
+
+#### StringBuffer 
+
+```java
+public final class StringBuffer implements java.io.Serializable {
+	private char[] value;
+}
+```
+
+* String 클래스는 인스턴스를 생성할 때 지정된 문자열을 변경할 수 없지만 StringBuffer 클래스는 변경이 가능함.
+* 내부적으로 문자열 편집을 위한 buffer를 가지고 있으며 인스턴스를 생성할 때 그 크기를 지정할 수 있음.
+* 문자열가지고 조작가능한 경우는 StringBuffer를 사용하자.
+* String 클래스는 불변, StringBuffer 클래스는 가변
+
+```java
+StringBuffer sb = new StringBuffer("abc");
+sb.append("123").append("zz");
+
+abc123zz 결과 출력
+```
+
+* StringBuffer는 equals(). 가 오버라이딩되어있지 않음. (주소비교)
+
+```java
+String Buffer sb = new StringBuffer("abc");
+String Buffer sb2 = new StringBuffer("abc");
+
+System.out.println(sb=sb2);				// false
+System.out.println(sb.equals(sb2));		// false
+
+String s = sb.toString();	// sb를 String으로 변환 해줘야함
+String s2 = sb2.toString();
+
+System.out.println(s.equals(s2));	// true
+```
+
+#### StringBuilder
+
+* StringBuilder는 StringBuffer와 유사하나 StringBuffer는 동기화 되어있고, StringBuilder는 동기화되어있지않음.
+* StringBuffer는 멀티쓰레드에 안전하고, 동기화는 StringBuffer 의 성능을 떨어뜨림.
+* 싱글쓰레드에서는 StringBuilder를 사용하면 성능 향상.
+  
+> StringBuffer는 동기 StringBuilder는 비동기, 멀티쓰레드인 경우 StringBuffer, 싱글쓰레드인경우 StringBuilder 사용하자.
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">String 클래스의 생성자와 메서드</summary>
+<div markdown="1">
+
+* 주로 사용되는 String 생성자와 메서드를 직접 사용해보자. 실무, 코테에서도 번번히 쓰이니 이런 것이 있다는 것만 알아두기.
+
+```java
+		//String(String s) - 주어진 문자열(s)을 갖는 String 인스턴스 생성
+		String s1 = new String("Hello");
+		System.out.println(new String(s1));		// Hello
+		
+		//String(char[] value) - 주어진 문자열(value)을 갖는 String 인스턴스 생성
+		char[] c = {'H', 'e', 'l', 'l', 'o'};
+		System.out.println(new String(c));		// Hello
+		
+		//String(StringBuffer buf) - StringBuffer 인스턴스가 갖고 있는 문자열과 같은 내용의 String 인스턴스 생성
+		StringBuffer sb = new StringBuffer("Hello");
+		System.out.println(new String(sb));		// Hello
+		
+		//char charAt(int index) - 지정된 위치에 있는 문자를 알려줌
+		System.out.println("Hello".charAt(1));	// e
+		System.out.println("012345".charAt(1));	// 1
+		
+		//int compareTo(String str) - 문자열(str) 과 사전순서 비교, 같으면 0 이전이면 음수 이후면 양수 반환
+		System.out.println("aaa".compareTo("aaa"));		// 0
+		System.out.println("aaa".compareTo("bbb"));		// -1
+		System.out.println("bbb".compareTo("aaa"));		// 1
+		
+		//String concat(String str) - 문자열(str) 을 뒤에 덧붙임
+		System.out.println("Hello".concat("Java"));	// HelloJava
+		
+		//boolean contains(CharSequence s) - 지정된 문자열이 포함되어있는지 검사
+		System.out.println("abcdefg".contains("bc"));		// true
+		
+		//boolean endsWith(String suffix) - 지정된 문자열 suffix로 끝나는지 검사
+		System.out.println("Hello.txt".endsWith("txt")); 	// true
+		
+		//boolean equalsIgonreCase(String str) - 대소문자 구분없이 비교
+		System.out.println("Hello".equalsIgnoreCase("HELLO"));		// true
+		System.out.println("Hello".equalsIgnoreCase("HELLo"));		// true
+		
+		//int indexOf(int ch) - 문자ch가 문자열에 존재하는지 확인 후 위치를 알려줌 못찾으면 -1 반환
+		System.out.println("Hello".indexOf('o'));	// 4
+		System.out.println("Hello".indexOf('k'));	// -1
+		
+		//String replace(char old, char new) - 문자열 중의 문자 old를 새로운 문자 new 로 치환
+		System.out.println("Hello".replace('H', 'C'));	//Cello
+		
+		//String[] split(String regex) - 분리자 regex로 나누어 문자열 배열에 담아 반환
+		String[] arr = "dog,cat,bear".split(",");
+		for (int i = 0; i < arr.length; i++) {
+			System.out.println(arr[i]);		//dog,cat,bear
+		}
+		
+		//String substring(int begine, int end) - 시작부터 끝 위치 범위 포함 문자열 
+		System.out.println("java.lang.Object".substring(2,5)); 	// va.
+
+		그 밖에 등등... toLowercase(), toUpperCase(), trime()
+```
+
+</div>
+</details>
