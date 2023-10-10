@@ -2282,3 +2282,175 @@ System.out.println(s.equals(s2));	// true
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">날짜의 시간 & 형식화</summary>
+<div markdown="1">
+
+java 1.8부터는 java.time 패키지를 제공하지만 그 전의 버전들은 Calendar, Date를 써오고 있기에 가볍게 알아보고 가자.
+  
+### Calendar 클래스
+
+```java
+Calendar cal = Calendar.getInstance();	
+
+public static void main(String[] args)   {
+		
+		Calendar cal = Calendar.getInstance();
+		
+		System.out.println(cal.get(Calendar.YEAR));
+	
+		// cal.get 으로 Calendar 클래스의 인스턴스 메서드 함수 호출 가능.
+		// YEAR, MONTH, WEEK_OF_YEAR, HOUR, MINUTE 등등..
+	}
+```
+
+* Calendar은 추상클래스이기 때문에 직접 객체를 생성하지 않고, 메서드를 통해 구현된 클래스의 인스턴스를 얻어야함.
+
+#### Calendar 예제1
+
+```java
+public static void main(String[] args)   {
+	
+	Calendar cal = Calendar.getInstance();
+	
+	System.out.println("이 해 년도 : " + cal.get(Calendar.YEAR));
+	System.out.println("월(0~11), 0:1월 : " + cal.get(Calendar.MONTH));
+	System.out.println("이 해의 몇 째 주 : " + cal.get(Calendar.WEEK_OF_YEAR));
+	System.out.println("이 달의 몇 째 주 : " + cal.get(Calendar.WEEK_OF_MONTH));
+	System.out.println("이 달의 몇 일 : " + cal.get(Calendar.DATE));
+	System.out.println("이 달의 몇 일 : " + cal.get(Calendar.DAY_OF_MONTH));
+	System.out.println("이 해의 몇 일 : " + cal.get(Calendar.DAY_OF_YEAR));
+	System.out.println("요일(1~7, 1:일요일) : " + cal.get(Calendar.DAY_OF_WEEK));
+	System.out.println("이 달의 몇 째 요일 : " + cal.get(Calendar.DAY_OF_WEEK_IN_MONTH));
+	System.out.println("오전_오후 (0: 오전, 1: 오후) : " + cal.get(Calendar.AM_PM));
+	System.out.println("시간(0~11) : " + cal.get(Calendar.HOUR));
+	System.out.println("시간(0~23) : " + cal.get(Calendar.HOUR_OF_DAY));
+	System.out.println("분(0~59) : " + cal.get(Calendar.MINUTE));
+	System.out.println("초(0~59) : " + cal.get(Calendar.SECOND));
+	System.out.println("1000분의 1초(0~999) : " + cal.get(Calendar.MILLISECOND));
+	System.out.println("이 달의 마지막 날 : " + cal.getActualMaximum(Calendar.DATE));
+}
+```
+```
+이 해 년도 : 2023
+월(0~11), 0:1월 : 9
+이 해의 몇 째 주 : 41
+이 달의 몇 째 주 : 2
+이 달의 몇 일 : 10
+이 달의 몇 일 : 10
+이 해의 몇 일 : 283
+요일(1~7, 1:일요일) : 3
+이 달의 몇 째 요일 : 2
+오전_오후 (0: 오전, 1: 오후) : 1
+시간(0~11) : 2
+시간(0~23) : 14
+분(0~59) : 36
+초(0~59) : 3
+1000분의 1초(0~999) : 950
+이 달의 마지막 날 : 31
+```
+
+#### Calendar 예제2
+
+```java
+public static void main(String[] args) {
+	
+	// 요일은 1부터 일요일이므로 0번째 배열은 공백
+	final String[] DAY_OF_WEEK = {"", "일", "월", "화", "수", "목", "금", "토"};
+	
+	Calendar date1 = Calendar.getInstance();
+	Calendar date2 = Calendar.getInstance();
+	
+	date1.set(2019, 3, 29);
+	System.out.println("date1은 " + toString(date1) + DAY_OF_WEEK[date1.get(Calendar.DAY_OF_WEEK)]+ "요일이고,");
+	System.out.println("date2은 " + toString(date2) + DAY_OF_WEEK[date2.get(Calendar.DAY_OF_WEEK)]+ "요일입니다.");
+	
+	// 두 날짜간의 차이
+	long difference = (date2.getTimeInMillis() - date1.getTimeInMillis())/1000;
+	System.out.println("그 날(date1)부터 지금(date2)까지 " + difference +"초가 지났습니다.");
+	System.out.println("일(day)로 계산하면 " + difference / (24*60*60) + "일 입니다.");
+}
+
+public static String toString(Calendar date) {
+	return date.get(Calendar.YEAR) + "년 " + (date.get(Calendar.MONTH)+1) + "월 "
+				+ date.get(Calendar.DATE) + "일 ";
+}
+```
+```
+date1은 2019년 4월 29일 월요일이고,
+date2은 2023년 10월 10일 화요일입니다.
+그 날(date1)부터 지금(date2)까지 140400000초가 지났습니다.
+일(day)로 계산하면 1625일 입니다.
+```
+
+#### Calendar 예제3
+
+```java
+public static void main(String[] args) {
+	final int[] TIME_UNIT = {3600, 60, 1};
+	final String[] TIME_UNIT_NAME = {"시간 ", "분 ", "초 "};
+	
+	Calendar time1 = Calendar.getInstance();
+	Calendar time2 = Calendar.getInstance();
+	
+	time1.set(Calendar.HOUR_OF_DAY, 10);
+	time1.set(Calendar.MINUTE, 20);
+	time1.set(Calendar.SECOND, 30);
+	
+	time2.set(Calendar.HOUR_OF_DAY, 20);
+	time2.set(Calendar.MINUTE, 30);
+	time2.set(Calendar.SECOND, 10);
+	
+	System.out.println("time1 : " + time1.get(Calendar.HOUR_OF_DAY) + "시 "
+			+ time1.get(Calendar.MINUTE) + "분 " + time1.get(Calendar.SECOND) + "시");
+	System.out.println("time2 : " + time2.get(Calendar.HOUR_OF_DAY) + "시 "
+			+ time2.get(Calendar.MINUTE) + "분 " + time2.get(Calendar.SECOND) + "시");
+	
+	long difference = Math.abs(time2.getTimeInMillis() - time1.getTimeInMillis())/1000;
+	
+	String tmp = "";
+	for (int i = 0; i < TIME_UNIT.length; i++) {
+		tmp += difference/TIME_UNIT[i] + TIME_UNIT_NAME[i];
+		difference %= TIME_UNIT[i];
+	}
+	System.out.println("time1과 time2의 차이는 " + difference + "초 입니다.");
+	System.out.println("시분초를 변환하면" + tmp + " 입니다.");
+}
+```
+```
+time1 : 10시 20분 30시
+time2 : 20시 30분 10시
+time1과 time2의 차이는 0초 입니다.
+시분초를 변환하면 10시간 9분 40초 입니다.
+```
+
+### DecimalFormat
+
+```java
+double number = 1234567,89;
+DecimalFormat df = new DecimalFormat("#.#E0");
+String result = df.format(number)	// 1.2E6
+```
+
+### SimpleDateFormat
+
+실제 실무에서 자주 클래스.
+주로 사용자가 원하는 엑셀 형식으로 변환해줄 때 사용했음.
+
+```java
+Date today = new Date();
+SimepleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+// 오늘 날짜를 yyyy-MM-dd 형태로 변환하여 반환함.
+String result = df.format(today);
+```
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">컬렉션 프레임웍</summary>
+<div markdown="1">
+
+</div>
+</details>
