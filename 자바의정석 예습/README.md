@@ -2452,5 +2452,141 @@ String result = df.format(today);
 <summary style="font-size:20px">컬렉션 프레임웍</summary>
 <div markdown="1">
 
+### 컬렉션 프레임웍
+
+**여러번 반복, 빠르게 전체적으로 다시 보고**
+**실습을 통해 어떻게 언제 쓰는지 파악하면서 공부하기**
+
+* 컬렉션 : 여러 객체(데이터)를 모아 놓은 것을 의미함.
+* 프레임웍 : 표준화, 정형화된 체계적인 프로그래밍 방식.
+* 컬렉션 프레임웍 : 데이터 군을 저장하는 클래스들을 표준화한 설계를 뜻함.
+
+#### 컬렉션 프레임웍 핵심 인터페이스
+
+1. List
+   * 순서가 있는 데이터 집합, 데이터의 중복을 허용함. ex) ArrayList, LinkedList, Stack, Vector 등..
+2. Set
+   * 순서가 없는 데이터 집합, 데이터의 중복을 허용하지 않음 ex) HashSet, TreeSet 등..
+3. Map
+   * 키(key) 와 값 (value) 의 쌍으로 이루어진 데이터의 집합, 순서는 유지되지 않고, 키는 중복을 허용하지 않고, 값은 중복을 허용함. ex) HashMap, TreeMap 등..
+
+* List, Set은 Collection 에 속하고 Map은 속하지 않음.
+
+#### List, Set, Map 인터페이스
+
+* List 인터페이스의 주요 인터페이스 : ArrayList, LinkedList
+  * 주요 메서드 : add, get, indexOf, remove, set, sort ...
+* Set 인터페이스 주요 인터페이스 : HashSet, TreeSet 
+  * 주요 메서드 : Collections 인터페이스와 동일
+* Map 인터페이스 주요 인터페이스 : HashMap, TreeMap 
+  * 주요 메서드 : put, putAll, remove, containsKey, containsValue, get, entrySet, keySet, values
+
+### ArrayList
+
+* 가장 많이 사용되는 컬렉션 클래스, List 인터페이스를 구현하기 때문에 순서유지, 중복허용의 특징이 있음.
+
+```java
+public class ArrayList extends AbstractList implements List, RandomAcess, Cloneable, java.io.Serializable {
+	...
+	trasient Object[] elementData;
+}
+```
+
+* ArrayList는 elementData 이름의 Object 배열을 멤버변수로 선언하고 있어서 모든 종류의 객체를 담을 수 있음.
+
+#### ArrayList 메서드
+
+* 추가,삭제 메서드 : add, addAll, remove, removeAll, clear
+* 검색 메서드 : indexOf, contains, get, set, toArray(), isEmpty(), trimToSize(), size()
+
+#### ArrayList 예제
+
+```java
+public class Ex11_1 {
+	@SuppressWarnings("deprecation")
+	public static void main(String[] args) {
+		
+		 // 기본 길이 10인 ArrayList 생성
+		 ArrayList list1 = new ArrayList(10);
+		 // list1에는 객체만 저장가능함, autoboxing 에 의해 기본형 -> 참조형으로 자동 변환됨.
+		 list1.add(new Integer(5));
+		 list1.add(new Integer(4));
+		 list1.add(new Integer(2));
+		 list1.add(new Integer(0));
+		 list1.add(new Integer(1));
+		 list1.add(new Integer(3));
+		 
+		 ArrayList list2 = new ArrayList(list1.subList(1, 4));
+		 
+		 printed(list1, list2);
+		 
+		 // Collections.sort 는 리스트의 정렬
+		 // Collection 은 인터페이스, Collections는 유틸 클래스
+		 Collections.sort(list1);
+		 Collections.sort(list2);
+		 
+		 printed(list1, list2);
+		 
+		 // list1을 포함하면 true
+		 System.out.println("list1.containsAll(list2) : " + list1.containsAll(list2));
+		 
+		 list2.add("B");
+		 list2.add("C");
+		 list2.add(3, "A");
+		 printed(list1, list2);
+		 
+		 list2.set(3, "AA");
+		 printed(list1, list2);
+		 
+		 // 지정된 객체의 위치 반환
+		 list1.add(0, "1");
+		 System.out.println("list1.indexOf(1) : " + list1.indexOf(2));
+		 printed(list1, list2);
+		 // 지정된 객체의 위치 삭제
+		 list1.remove(0);
+		 
+		 // list1에서 list2 겹치는 부분만 제외하고 나머지 삭제
+		 System.out.println("list1.retainAll(list2) : " + list1.retainAll(list2));
+		 printed(list1, list2);
+	}
+
+	private static void printed(ArrayList list1, ArrayList list2) {
+		System.out.println("list1 : " + list1);
+		System.out.println("list2 : " + list2);
+		System.out.println();
+	}
+}
+```
+
+#### ArrayList 추가와 삭제
+
+* ArrayList의 요소를 삭제하는 경우, 삭제할 객체의 바로 아래에 있는 데이터를 한 칸씩 위로 복사해서 덮어쓰는 방식으로 처리함.
+* 만일 삭제할 객체가 마지막 데이터라면, 복사할 필요 없이 단순히 null로 변경해주면 됨.
+ 
+```java
+public class Ex11_2 {
+
+	public static void main(String[] args) {
+		
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		
+		for (int i = 0; i < 5; i++) {
+			list.add(i);
+		}
+		
+//		for (int i = 0; i < 5; i++) {
+//			list.remove(new Integer(i));
+//		}
+		
+		for (int i = list.size()-1; i >= 0; i--) {
+			list.remove(i);
+		}
+	}
+}
+```
+
+* remove 는 i번째 인덱스에 있는 위치의 객체를 제거하기 때문에 마지막에 저장된 것부터 삭제해주자.
+* 배열의 중간에 위치한 객체를 추가하거나 삭제하는 경우는 작업시간이 오래 걸리므로 성능이 많이 저하됨.
+
 </div>
 </details>
