@@ -2558,6 +2558,33 @@ public class Ex11_1 {
 }
 ```
 
+#### ArrayList 예제2
+
+```java
+public class ArrayListEx1 {
+
+	public static void main(String[] args) {
+		
+		// 5명의 사람의 이름을 입력 받아 ArrayList에 저장 후 이들 중 '김'씨 성을 가진 사람 출력 
+		
+		ArrayList<String> list = new ArrayList<String>();
+		Scanner sc = new Scanner(System.in);
+		
+		for (int i = 0; i < 5; i++) {
+			list.add(sc.next());
+		}
+
+		for (int i = 0; i < list.size(); i++) {
+			String name = list.get(i);
+			if(name.startsWith("김")) {
+				System.out.println(name);
+			}
+		}
+	}
+}
+
+```
+
 #### ArrayList 추가와 삭제
 
 * ArrayList의 요소를 삭제하는 경우, 삭제할 객체의 바로 아래에 있는 데이터를 한 칸씩 위로 복사해서 덮어쓰는 방식으로 처리함.
@@ -2587,6 +2614,248 @@ public class Ex11_2 {
 
 * remove 는 i번째 인덱스에 있는 위치의 객체를 제거하기 때문에 마지막에 저장된 것부터 삭제해주자.
 * 배열의 중간에 위치한 객체를 추가하거나 삭제하는 경우는 작업시간이 오래 걸리므로 성능이 많이 저하됨.
+
+### LinkedList
+
+* LinkedList는 불연속적으로 존재하는 데이터를 서로 연결한 형태로 구성되어있음.
+
+![Alt text](image-5.png)
+
+* LinkedList는 각기 노드마다 화살표로 연결되어 리스트 형태로 나열되어있음.
+* 노드는 하나의 객체이고, 객체를 만들면 객체의 주소가 생기게 되는데, 노드마다 각기 객체의 주소를 참고함으로써 연결 형태를 구성함.
+
+```java
+class Node{
+	Node next;		// 다음 요소의 주소를 저장
+	int data;		// 데이터를 저장
+}
+```
+
+* 데이터의 추가 삭제에 용이하다는 장점
+* 데이터 n번째 데이터까지 차례대로 따라가면서 읽어야하므로 데이터를 읽는 시간은 느리다는 단점.
+* 이를 보완하고자 한 것이 doubly linkted list (양방향 연결 리스트) 임. (여전히 탐색은 n의 시간복잡도)
+* 자바의 linkedlist 는 양방향 연결 리스트로 구현되어있음.
+
+![Alt text](image-6.png)
+
+```java
+class Node{
+	Node next;		// 다음 요소의 주소를 저장
+	Node prev;		// 이전 노드 주소를 저장
+	int data;		// 데이터를 저장
+}
+```
+
+![Alt text](image-7.png)
+
+* 순차적으로 데이터를 추가/삭제 - ArrayList 가 빠름
+* 비순차적으로 데이터를 추가/삭제 - LinkedList 가 빠름
+* 접근시간 - ArrayList 가 빠름
+* FIFO 선입선출이 빈번할 경우, 큐를 사용해야할 때 LinkedList를 사용한다라고 말하지만,
+* 외국 사례에선 LinktedLIst 를 사용하는 사례보다 그냥 ArrayList를 사용하는 사례가 많다고함. (성능상으로 큰 차이 X)
+  
+### Stack, Queue
+
+#### Stack
+
+![Alt text](image-10.png)
+
+* 상자에 물건을 쌓아 올리듯이 데이터를 쌓는 자료 구조
+* LIFO(Last In First Out) 마지막에 저장한 데이터를 가장 먼저 꺼내게 되는 구조
+
+#### Stack 메서드
+
+1.	boolean empty() : Stack이 비어있는지 확인
+2.	Object peek() : Stack의 맨 위에 저장된 객체 반환, pop()과 달리 객체는 꺼내지 않음. 비었을 때 EmptyStackException 발생
+3.	Object pop() : Stack의 맨 위에 저장된 객체를 꺼냄, 비었을 때 EmptyStackException 발생
+4.	Object push(Object item) : Stack에 객체를 저장
+5.	int search(Object o) : Stack에서 주어진 객체를 찾아서 위치를 반환
+
+#### Quque
+
+![Alt text](image-9.png)
+
+* 줄을 지어 순서대로 처리되는 자료구조
+* FIFO(First In FIrst Out) 먼저 들어온 데이터가 가장 먼저 나가는 구조
+* Queue는 인터페이스로 정의되어있어 객체로 쓰고자 할 때는 클래스를 직접 구현하던가, 구현한 클래스를 사용해야함.
+
+#### Queue 메서드
+
+1.	boolean add(Object o) : 지정된 객체 Queue에 추가, 저장공간 부족 시에 illegalStateException 발생
+2.	Object remove() : Queue 에서 객체를 꺼내 반환, 비어있을 떄 NoSuchElementException 발생
+3.	Object element() : 삭제없이 요소를 읽어옴, peek과 달리 Queue 비었을 때 NoSuchElementExceoption 발생
+4.	boolean offer(Object o) : Queue 에 객체를 저장
+5.	Object poll() : Queue 에서 객체를 꺼내서 반환
+6.	Object peek() : 삭제없이 요소를 읽어옴
+
+#### Stack, Queue 메서드 사용 예제
+
+```java
+public class StackEx1 {
+
+	public static void main(String[] args) {
+		
+		Stack<Integer> st = new Stack<Integer>();
+		Queue<Integer> q = new LinkedList<Integer>();
+		
+		st.push(1);
+		st.push(2);
+		st.push(3);
+
+		q.offer(1);
+		q.offer(2);
+		q.offer(3);
+		
+		System.out.println("=stack=");
+		while(!(st.empty())){
+			System.out.println(st.pop());
+		}
+		System.out.println("=queue=");
+		while(!(q.isEmpty())){
+			System.out.println(q.poll());
+		}
+	}
+}
+```
+```
+=stack=
+3
+2
+1
+=queue=
+1
+2
+3
+```
+
+#### Stack 활용예제
+
+* 스택 활용 예 : 웹브라우저의 뒤로가기/앞으로가기
+* 큐 활용 예 : 최근사용문서, 버퍼
+  
+```java
+public class Ex11_3 {
+
+	public static void main(String[] args) {
+		
+		String expression = "((3+5*8-2))";
+		Stack<String> s = new Stack<String>();
+		
+		System.out.println("expression : " + expression);
+		
+		try {
+			for (int i = 0; i < expression.length(); i++) {
+				char ch = expression.charAt(i);
+				if(ch == '(') {
+					s.push(ch + "");
+				}else if(ch == ')') {
+					s.pop();
+				}
+			}
+			if(s.isEmpty()) {
+				System.out.println("괄호가 일치합니다.");
+			}else {
+				System.out.println("괄호가 일치하지 않습니다.");
+			}
+		} catch (EmptyStackException e) {
+			System.out.println("괄호가 일치하지 않습니다.");
+		}
+		
+	}
+}
+```
+```
+expression : ((3+5*8-2))
+괄호가 일치합니다.
+```
+
+* '(' 를 만나면 stack에 push 메서드로 값을 넣고 ')' 를 만나면 stack에서 pop 메서드로 '(' 를 꺼냄.
+* ')' 를 만나서 '(' 를 꺼내려고 할 때 스택이 비어있으면 괄호 일치, 비어있지 않으면 괄호가 일치하지 않는 것임.
+
+#### Queue 활용예제
+
+* 스택 활용 예 : 웹브라우저의 뒤로가기/앞으로가기, 수식괄호계산
+* 큐 활용 예 : 최근사용문서, 버퍼
+  
+```java
+public class Ex11_4 {
+
+	static Queue<String> q = new LinkedList<String>();
+	static final int MAX_SIZE = 5;
+	
+	public static void main(String[] args) {
+		System.out.println("help 입력 시 도움말을 볼 수 있습니다.");
+	
+		while(true) {
+			System.out.print(">>");
+			
+			try {
+				Scanner sc = new Scanner(System.in);
+				String input = sc.nextLine().trim();
+						
+				if("".equals(input)) {
+					continue;
+				}
+				
+				if(input.equalsIgnoreCase("q")) {
+					System.exit(0);
+				}else if(input.equalsIgnoreCase("help")) {
+					System.out.println(" help - 도움말을 보여줍니다.");
+					System.out.println(" q or Q - 프로그램을 종료합니다.");
+					System.out.println(" history - 최근에 입력한 명령어를 " + MAX_SIZE + "개 보여줍니다.");
+				}else if(input.equalsIgnoreCase("history")) {
+					save(input);
+					
+					LinkedList<String> list = (LinkedList<String>)q;
+					
+					for (int i = 0; i < list.size(); i++) {
+						System.out.println((i+1) + "." + list.get(i));
+					}
+				}else {
+					save(input);
+					System.out.println(input);
+				}
+			} catch (Exception e) {
+				System.out.println("입력오류입니다.");
+			}
+		}
+	}
+	
+	public static void save(String input) {
+		if(!"".equals(input)) {
+			q.offer(input);
+		}
+		
+		if(q.size() > MAX_SIZE) {
+			q.remove();
+		}
+	}
+}
+```
+```
+help 입력 시 도움말을 볼 수 있습니다.
+>>Hello
+Hello
+>>Java
+Java
+>>Spring
+Spring
+>>Stack
+Stack
+>>Queue
+Queue
+>>help
+ help - 도움말을 보여줍니다.
+ q or Q - 프로그램을 종료합니다.
+ history - 최근에 입력한 명령어를 5개 보여줍니다.
+>>HIstory
+1.Java
+2.Spring
+3.Stack
+4.Queue
+5.HIstory
+>>Q
+```
 
 </div>
 </details>
