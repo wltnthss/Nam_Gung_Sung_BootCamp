@@ -1,4 +1,4 @@
-# 부트캠프전 자바의 정석 예습
+`# 부트캠프전 자바의 정석 예습
 
 ## 1~5장은 반복문, 조건문, 배열이라 짧게 보고 알고리즘 문제 풀이, 6장 객체지향부터는 2번씩 보고 README 정리. 2번씩 보고 완벽히 이해했으면 Spring 공부 및 토이 프로젝트 진행
 
@@ -2930,6 +2930,176 @@ public class MapIteratorTest {
 ```
 
 * 자세한 Map 사용법은 뒤에서 자세하게 예제와 알아보자.
+
+### Arrays
+
+* 배열을 다루기 편리한 매서드(static) 제공함.
+
+#### Arrays 메서드 - toString, 복사
+
+```java
+public class ArraysTest {
+
+	public static void main(String[] args) {
+		
+		ArrayList<Integer> list = new ArrayList<Integer>(Arrays.asList(1, 2, 3));
+		System.out.println(list);
+	} 
+}
+```
+
+* 배열의 타입만 다르게 오버로딩 되어있는 - toString() 기본형 배열과 참조형 배열 별로 하나씩 정의되어있음.
+
+```java
+public class ArraysTest {
+
+	public static void main(String[] args) {
+		
+		// toString()
+		ArrayList<Integer> list = new ArrayList<Integer>(Arrays.asList(1, 2, 3));
+		System.out.println(list);
+		System.out.println();
+		
+		// copyOf()
+		int[] arr1 = {1, 2, 3, 4};
+		int[] arr2 = Arrays.copyOf(arr1, arr1.length);
+		for(int newCopyArray : arr2) {
+			System.out.println(newCopyArray);
+		}
+	}
+}
+```
+
+#### Arrays 메서드 - fill(), setAll() ,sort(), binarySearch()
+
+```java
+import java.util.Arrays;
+
+public class ArraysTest {
+
+	public static void main(String[] args) {
+		
+		//fill(), setAll()
+		int[] arr = new int[5];
+		Arrays.fill(arr, 9);
+		
+		for (int i : arr) {
+			System.out.print(i + " ");
+		}
+		System.out.println();
+		Arrays.setAll(arr, i -> (int)(Math.random()*5) + 1);
+		for (int i : arr) {
+			System.out.print(i + " ");
+		}
+		
+		System.out.println();
+		//sort(), binarySearch()
+		Arrays.sort(arr);
+		for (int i : arr) {
+			System.out.print(i + " ");
+		}
+		System.out.println();
+		int[] binarySearch = {4, 2, 6, 7, 3};
+		Arrays.sort(binarySearch);
+		System.out.println(Arrays.binarySearch(binarySearch, 4));
+	}
+}
+```
+```
+9 9 9 9 9 
+1 4 5 1 5 
+1 1 4 5 5 
+2
+
+```
+
+* fill() 은 배열의 모든 요소를 지정된 값으로 채움.
+* setAll() 은 배열을 채우는데 사용할 함수형 인터페이스를 매개변수로 받음.
+* sort() 는 배열을 정렬할 때
+* binarySearch() 는 알고리즘에도 자주 나오는 메서드이므로 잘 기억해두자
+  * 배열이 정렬되어있다는 상태를 전제하에 지정된 값이 지정된 위치를 찾아서 반환함.
+  * 배열의 검색할 범위를 반복적으로 절반씩 줄여가며 검색하므로 검색속도가 이진 검색보다 빠름.
+  * 단, binarySearch() 를 사용할 때는 배열이 정렬되어있다는 것을 잘 기억해두고 사용하자.
+
+#### Arrays 메서드 - toString(), deepToString(), equals(), deepEquals()
+
+```java
+import java.util.Arrays;
+
+public class ArraysTest {
+
+	public static void main(String[] args) {
+		
+		// toString, deepToString
+		int[] arr = {1, 2, 3, 4};
+		int[] arr2 = {1, 2, 3, 4};
+		int[][] twoArr = { {1, 2}, {3, 4} };
+		int[][] twoArr2 = { {1, 2}, {3, 4} };
+		
+		System.out.println(Arrays.toString(arr));
+		System.out.println(Arrays.deepToString(twoArr));
+		
+		// equals, deepEquals
+		System.out.println(Arrays.equals(arr, arr2));
+		System.out.println(Arrays.deepEquals(twoArr, twoArr2));
+	}
+}
+```
+```
+[1, 2, 3, 4]
+[[1, 2], [3, 4]]
+true
+true
+```
+
+* 많이 사용해왔던 toString(), equals() 이차원 배열에서는 deepToString(), deepEquals() 사용함을 알아두자.
+
+#### Arrays 메서드 - asList(Object ... a)
+
+```java
+public class ArraysTest {
+
+	public static void main(String[] args) {
+		//asList(Object ...a)
+		List<Integer> list = Arrays.asList(1,2,3,4,5);
+		System.out.println(list);
+		// list.add(6); asList()가 반환한 List의 크기는 변경할 수 없음.
+		// 변경하고하자면 아래와 같이 사용 가능함.
+		List<Integer> lists = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5));
+		lists.add(6);
+		System.out.println(lists);
+	}
+}
+```
+```
+[1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5, 6]
+```
+
+* asList()는 배열을 List에 담아서 반환함. 매개변수의 타입이 가변인수라서 배열 생성없이 저장할 요소들만 나열하는 것도 가능.
+* asList()가 반환한 List의 크기를 변경할 수는 없음. 새로운 ArrayList를 생성하여 변경하는 것은 가능함.
+
+### Comparator 와 Comparable
+
+* 궁금한 인터페이스, 클래스의 오픈 소스를 보고싶을 때 들어가면 익숙한 Comparator, Comparable 볼 수 있었음. 얘네는 뭘까?
+* Comparator와 Comparable은 모두 인터페이스로 컬렉션을 정렬하는데 필요한 메서드를 정의함.
+* Comparable 을 구현한 클래스는 기본 정렬기준을 구현하는데 사용하고, Comparator 는 기본 정렬기준 외에 다른 기준으로 정렬하고자할 때 사용함.
+* 실제 소스는 아래와 같음
+
+```java
+public interface Comparator {
+	int compare(Object o1, Object o2);	// o1과 o2를 비교
+	boolean equals(Object obj);
+}
+
+public interface Comparable {
+	int compareTo(Object o);	// 객체 자신 (this) 와 o를 비교
+}
+```
+
+* Arrays.sort 는 String의 Comparable 구현에 의한 정렬
+* Arrays.sort(Object[] a, String.CASE_INSENSITIVE_ORDER) 은 지정한 Comparator에 의한 정렬
+* 위의 두 차이점이 있다는 것을 알아두자.
 
 </div>
 </details>
