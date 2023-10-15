@@ -2859,3 +2859,77 @@ Queue
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">Iterator, Arrays, Comparable</summary>
+<div markdown="1">
+
+### Iterator, ListIterator, Enumeration 
+
+* 컬렉션에 저장된 데이터를 접근하는데 사용되는 인터페이스
+* Enumeration 은 Iterator 의 구버전
+* ListIteratior 는 Iterator 의 접근성을 향상시킨 것(단방향 -> 양방향) (잘쓰이진 않음 Iterator 만 정확히 알고 넘어가자.)
+* Iterator는 왜 쓸까?
+  * 컬렉션에 저장된 요소들을 읽어오는 방법을 표준화하여 읽어오기 위함. List, Set, Hash 는 각 메서드가 읽어오는 방법이 다르기때문에
+  * 표준화된 Iterator 를 사용함으로써 요소들을 읽어오는 역할을 하기 위함.
+
+```java
+public class IteratorTest {
+
+	public static void main(String[] args) {
+		
+		List<Integer> list = new ArrayList<Integer>();	// 다른 컬렉션 변경시 이부분만 고치면 사용 가능함.
+		list.add(1);
+		list.add(2);
+		list.add(3);
+		
+		Iterator<Integer> it = list.iterator();
+		
+		while(it.hasNext()) {
+			System.out.println(it.next());
+		}
+	}
+} 
+```
+
+* Iterator는 Collection 인터페이스의 정의되어있어 List, Set 도 사용가능함.
+* iterator() 라는 메서드를 호출하면 Iterator it 객체에 담김.
+* 객체를 활용하여 읽어올 요소가 있는지 hasNext() 로 확인 후 next() 로 요소를 읽어서 사용함.
+* iterator() 는 1회용이라 한 번 사용하고나면 객체를 다시 얻어와야함.
+
+#### 사용 메서드 
+
+* boolean hasNext() - 읽어 올 요소가 남아있는지 확인, 있으면 true, 없으면 false 반환
+* Object next() - 다음 요소를 읽어옴, next() 를 호출하기전에 hasNext() 를 호출하여 읽어 올 요소가 있는지 확인
+
+### Map과 Iterator
+
+* List, Set 은 Iterator를 사용할 수 있지만 Map 인터페이스는 key, value를 쌍으로 저장하므로 iterator() 를 직접 호출할 수 없음.
+* Map을 사용할 때는 keySet() 과 entrySet() 을 사용하자.
+
+```java
+public class MapIteratorTest {
+
+	public static void main(String[] args) {
+
+		Map<Integer, String> map = new HashMap<Integer, String>();
+		map.put(1, "Son");
+		map.put(2, "Park");
+
+		// 방법1 - keySet 활용
+		for(Integer key : map.keySet()) {
+			System.out.println("key  : " + key + ", value : " + map.get(key));
+		}
+		System.out.println();
+		// 방법2 - entrySet 활용
+		for(Map.Entry<Integer, String> entry : map.entrySet()) {
+			System.out.println("key  : " + entry.getKey() + ", value : " + entry.getValue());
+		}
+	}
+}
+```
+
+* 자세한 Map 사용법은 뒤에서 자세하게 예제와 알아보자.
+
+</div>
+</details>
