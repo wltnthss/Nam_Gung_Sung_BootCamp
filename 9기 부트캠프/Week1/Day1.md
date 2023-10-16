@@ -289,17 +289,44 @@ public class Ex10 {
 
 	public static void main(String[] args) {
 		
+		// 방법1
 		for (int i = 1, n = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
 				System.out.print(((n+1 <= j) && (j <= 5-n)) ? " " : "*");
 			}
 			System.out.println();
-			System.out.println(i);
 			if(i < 3) {
 				n++;
 			}else {
 				n--;
 			}
+		}
+		System.out.println();
+		// 방법2
+		for(int i = 0; i < 3; i++) {
+			for(int j = 0; j <= i; j++) {
+				System.out.printf("*");
+			}
+			for(int j = 0; j < 3*2 - 2*(i+1); j++) {
+				System.out.printf(" ");
+			}
+			for(int j = 0; j <= i; j++) {
+				System.out.printf("*");
+			}
+			System.out.println();
+		}
+				
+		for(int i = 1; i < 3; i++) {
+			for(int j = 0; j < (3-i); j++) {
+				System.out.printf("*");
+			}
+			for(int j = 0; j < 2*i; j++ ) {
+				System.out.printf(" ");
+			}
+			for(int j = 0; j < (3-i); j++) {
+				System.out.printf("*");
+			}
+			System.out.println();
 		}
 	}
 }
@@ -310,4 +337,10 @@ public class Ex10 {
 *****
 ** **
 *   *
+
+*    *
+**  **
+******
+**  **
+*    *
 ```

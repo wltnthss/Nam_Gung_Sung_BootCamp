@@ -3101,5 +3101,48 @@ public interface Comparable {
 * Arrays.sort(Object[] a, String.CASE_INSENSITIVE_ORDER) 은 지정한 Comparator에 의한 정렬
 * 위의 두 차이점이 있다는 것을 알아두자.
 
+### HashSet
+
+* Set인터페이스를 구현하여 순서와, 중복이 허용되지않음.
+* 순서를 유지하고자하면 LinkedHashSet 을 사용해야함.
+
+#### HashSet 예제1
+
+```java
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+public class HashSetTest {
+
+	public static void main(String[] args) {
+		
+		Object[] arr = {"1", "2", "5", "6", "2", "1"};
+		
+		Set<Object> hashSet = new HashSet<Object>();
+		
+		for (int i = 0; i < arr.length; i++) {
+			hashSet.add(arr[i]);
+		}
+		
+		Iterator<Object> iterator = (Iterator<Object>) hashSet.iterator();
+		
+		while(iterator.hasNext()) {
+			System.out.println(iterator.next());
+		}
+	}
+}
+```
+```
+1 2 5 6 
+```
+
+### TreeSet
+
+* 이진 탐색 트리라는 자료구조 형태로 데이터를 저장하는 컬렉션 클래스임.
+* 범위 검색과 정렬에 유리하나 데이터 추가, 삭제에는 성능이 더 안나옴.
+
+
+
 </div>
 </details>
