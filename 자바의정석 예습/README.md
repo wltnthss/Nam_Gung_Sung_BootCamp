@@ -931,7 +931,47 @@ class Customer {
 * 장점
   1.  유지보수 용이 : 여러 객체를 하나의 타입으로 관리 가능.
   2.  재사용성 : 부모 클래스를 만들어놓음으로써 재사용성이 높아짐.
- 
+
+### 매개변수의 다형성 
+
+* 참조형 매개변수는 매서드 호출시, 자신과 같은 타입 또는 자손타입의 인스턴스를 넘겨줄 수 있음.
+
+```java
+package 매개변수다형성;
+
+public class Buyer {
+
+	int money = 1000;
+	int bonusPoint = 0;
+	
+	// 부모 클래스 매개변수를 이용해 호출하지 않는 경우 buy 오버로딩을 통해 여러개 선언해야함.
+	void buy(Tv t) {
+		money -= t.price;
+		bonusPoint += t.bonusPoint;
+	}
+	void buy(Computer c) {
+		money -= c.price;
+		bonusPoint += c.bonusPoint;
+	}
+	void buy(Audio a) {
+		money -= a.price;
+		bonusPoint += a.bonusPoint;
+	}
+}
+```
+
+* Buyer클래스에서 자식 클래스 Tv, Computer, Audio 를 오버로딩함으로써 매서드 buy를 구현할 수도 있으나 이는 맞지 않음.
+* 자식 클래스가 생길 때마다 오버로딩을 일일이 추가해줄 수는 없기 떄문에 아래와 같이 코드를 작성하여 사용함.
+
+```java
+	void buy(Product p) {
+		money -= p.price;
+		bonusPoint += p.bonusPoint;
+	}
+```
+
+* 다형성의 성질을 이용해 부모 클래스의 참조형 매개변수를 사용함으로써 하나의 메서드만으로 기능을 구현할 수 있음.
+
 </div>
 </details>
 
