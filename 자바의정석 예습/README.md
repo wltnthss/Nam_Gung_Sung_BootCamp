@@ -3109,10 +3109,6 @@ public interface Comparable {
 #### HashSet 예제1
 
 ```java
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 public class HashSetTest {
 
 	public static void main(String[] args) {
@@ -3124,25 +3120,184 @@ public class HashSetTest {
 		for (int i = 0; i < arr.length; i++) {
 			hashSet.add(arr[i]);
 		}
+		System.out.println(hashSet);
 		
 		Iterator<Object> iterator = (Iterator<Object>) hashSet.iterator();
 		
 		while(iterator.hasNext()) {
-			System.out.println(iterator.next());
+			System.out.print(iterator.next() + " ");
 		}
 	}
 }
 ```
 ```
+[1, 2, 5, 6]
 1 2 5 6 
 ```
+
+* 결과는 순서가 유지된 것처럼 나왔으나 순서는 유지되지않음.
+
+#### HashSet 예제2
+
+```java
+public class HashSetTest {
+
+	public static void main(String[] args) {
+		
+		Set<Integer> set = new HashSet<Integer>();
+		
+		for (int i = 0; set.size() < 6; i++) {
+			int num = (int)(Math.random() * 45) + 1;
+			set.add(num);
+		}
+		
+		List<Integer> list = new LinkedList<Integer>(set);
+		Collections.sort(list);
+		System.out.println(list);
+	}
+}
+```
+```
+[7, 12, 13, 16, 25, 36]
+```
+
+* set의 크기가 6보다 작은 동안 1~45 사이의 난수를 저장함.
+* set의 모든 요소를 list에 저장하고 list를 정렬 후에 출력한 결과가 나옴.
+
+#### HashSet 예제3
+
+```java
+public class HashSetTest {
+	class Person{
+		
+		String name;
+		int age;
+		
+		Person(String name, int age) {
+			this.name = name;
+			this.age = age;
+		}
+		
+		public String toString() {
+			return "name : " + name + ", age  : " + age; 
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if(!(obj instanceof Person)) return false;
+			Person p = (Person)obj;
+			return name.equals(p.name) && age == p.age;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, age);
+		}
+	}
+	public class HashSetTest {
+
+		public static void main(String[] args) {
+		
+			Set<Person> set = new HashSet<Person>();
+			set.add(new Person("Son", 29));
+			set.add(new Person("Son", 29));
+			System.out.println(set);
+		}
+	}
+}
+```
+```
+[name : Son, age  : 29]
+```
+
+* equals 를 오버라이딩 하지 않으면 같은 객체를 생성하더라도 중복 값이 나오므로 오버라이딩을 해줘야함.
+* 이 때 equals 뿐만 아니라 hashCode의 값도 동일해야하므로 hashCode도 오버라이딩 해줘야함.
 
 ### TreeSet
 
 * 이진 탐색 트리라는 자료구조 형태로 데이터를 저장하는 컬렉션 클래스임.
+* 이진 트리는 모든 노드가 최대 2개의 하위 노드를 가짐.
 * 범위 검색과 정렬에 유리하나 데이터 추가, 삭제에는 성능이 더 안나옴.
+* Set 인터페이스를 구현했으므로 중복과, 순서를 지키지않음.
 
+* TreeSet은 이진 탐색 트리의 성능을 향상시킨 **레드-블랙 트리** 로 구현되어있음.
+ 
+![Alt text](image-11.png) 
 
+* 레드 블랙 트리란?
+  * 일반적인 이진 탐색 트리는 트리의 높이만큼 시간이 걸림.
+  * 레드 블랙 트리는 부모노드보다 작은 값을 가지는 노드는 왼족, 큰 값을 가지면 오른쪽으로 배치하여 트리의 균형을 맞춤.
+
+```java
+class TreeNode{
+	TreeNode left;
+	Object element;
+	TreeNode right;
+}
+```
+
+#### 이진 탐색 트리(binary search tree)
+
+* 이진 탐색 트리는 부모노드의 왼쪽에는 부모노드보다 작은 값을, 오른쪽에는 부모노드보다 큰 값을 저장함.
+* 데이터가 많아질 수록 추가, 삭제에 걸리는 시간은 더 걸림(비교 횟수가 증가하므로)
+
+#### 이진 탐색 트리 저장과정
+
+* HashSet은 equals()와 hashCode() 로 비교함.
+* TreeSet은 compare()을 통해 비교함.
+* ex) 7, 4, 9, 1 ,5 를 비교할 때 
+	* 첫 번째로 저장되는 값은 루트 (7)
+	* 두 번째 값은 루트부터 시작해서 작은 값은 왼쪽에 큰 값은 오른쪽에 저장함. 7밑에 4, 9
+	* 그 다음으로 1이 나오므로 4밑에 좌측 자손 노드에는 1이 우측 자손 노드에는 5가 들어감.
+
+#### TreeSet 예제1
+
+```java
+public class TreeSetTest {
+
+	public static void main(String[] args) {
+		Set<Integer> set = new TreeSet<Integer>();
+		
+		for (int i = 0; set.size() < 6; i++) {
+			int num = (int)(Math.random() * 45) + 1;
+			set.add(num);
+		}
+		System.out.print(set + " ");
+	}
+}
+```
+```
+[1, 6, 16, 17, 24, 39] 
+```
+
+* TreeSet은 Set인터페이스를 구현해서 순서를 지키지 않으나 TreeSet은 구현과정에서 이미 정렬하기 때문에 따로 정렬할 필요가 없음.
+
+#### TreeSet 예제2
+
+```java
+public class TreeSetTest {
+
+	public static void main(String[] args) {
+		TreeSet<Integer> treeSet = new TreeSet<Integer>();
+		int[] score = {80, 95, 50, 35, 45, 65, 10, 100};
+		
+		for (int i = 0; i < score.length; i++) {
+			treeSet.add(score[i]);
+		}
+		
+		System.out.println("50보다 작은 값 :" + treeSet.headSet(50));
+		System.out.println("50보다 큰 값 :" + treeSet.tailSet(50));
+		System.out.println("40 ~ 80사이의 값 :" + treeSet.subSet(40, 80));
+	}
+}
+```
+```
+50보다 작은 값 :[10, 35, 45]
+50보다 큰 값 :[50, 65, 80, 95, 100]
+40 ~ 80사이의 값 :[45, 50, 65]
+```
+
+### HashMap과 Collections 메서드
 
 </div>
 </details>
