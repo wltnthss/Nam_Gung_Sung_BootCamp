@@ -3101,6 +3101,9 @@ public interface Comparable {
 * Arrays.sort(Object[] a, String.CASE_INSENSITIVE_ORDER) 은 지정한 Comparator에 의한 정렬
 * 위의 두 차이점이 있다는 것을 알아두자.
 
+</div>
+</details>
+
 <details>
 <summary style="font-size:20px">HashSet, TreeSet, HashMap, Collections</summary>
 <div markdown="1">
