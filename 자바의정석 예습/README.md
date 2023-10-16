@@ -3101,6 +3101,10 @@ public interface Comparable {
 * Arrays.sort(Object[] a, String.CASE_INSENSITIVE_ORDER) 은 지정한 Comparator에 의한 정렬
 * 위의 두 차이점이 있다는 것을 알아두자.
 
+<details>
+<summary style="font-size:20px">HashSet, TreeSet, HashMap, Collections</summary>
+<div markdown="1">
+
 ### HashSet
 
 * Set인터페이스를 구현하여 순서와, 중복이 허용되지않음.
@@ -3298,6 +3302,7 @@ public class TreeSetTest {
 ```
 
 ### HashMap과 Collections 메서드
+
 
 </div>
 </details>
