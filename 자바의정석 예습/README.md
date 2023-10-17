@@ -3306,6 +3306,232 @@ public class TreeSetTest {
 
 ### HashMap과 Collections 메서드
 
+* HashMap은 Map을 구현했으므로 앞에서 살펴본 Map의 특징, key와 value를 묶어서 하나의 데이터(entry)로 저장한다는 특징이 있음.
+* 순서와 중복을 허용하지않음. 중복의 경우에는 키값은 허용하지않고 값은 허용함.
+* 해싱기법으로 데이터를 저장하므로 검색이 빠름.
+
+```java
+public class HashMap extends AbstractMap implements Map, Cloneable, Serializable{
+	transient Entry[] table;
+	...
+	static class Entry implements Map.Entry {
+		final Object key;
+		Object value;
+		...
+	}
+}
+```
+
+#### HashMap 예제1
+
+```java
+public class HashMapTest {
+
+	public static void main(String[] args) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("myId", "1234");
+		map.put("asdf", "1111");
+		map.put("asdf", "1234");
+		
+		Scanner sc = new Scanner(System.in);
+		
+		while(true) {
+			System.out.println("id, password 입력");
+			System.out.print("id : ");
+			String id = sc.next();
+			
+			System.out.print("password : ");
+			String password = sc.next();
+			System.out.println();
+			
+			if(!(map.containsKey(id))){
+				System.out.println("입력하신 id는 존재하지않음. 다시 입력");
+				continue;
+			}
+			
+			if(!(map.get(id).equals(password))) {
+				System.out.println("비밀번호가 일치하지 않습니다. 다시 입력");
+			}else {
+				System.out.println("id와 비밀번호가 일치합니다.");
+				break;
+			}
+		}
+	}
+```
+```
+id, password 입력
+id : asdf
+password : 1111
+
+비밀번호가 일치하지 않습니다. 다시 입력
+id, password 입력
+id : asdf
+password : 1234
+
+id와 비밀번호가 일치합니다.
+```
+
+* HashMap에 id를 중복해서 입력하면 오류가 나지 않음. 하지만 키값은 덮어씌워짐.
+
+#### HashMap 예제2
+
+```java
+public class HashMapTest2 {
+
+	public static void main(String[] args) {
+		
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		
+		map.put("김자바", 90);
+		map.put("김자바", 100);
+		map.put("이자바", 100);
+		map.put("강자바", 80);
+		map.put("안자바", 90);
+		
+		Set set = map.entrySet();
+		Iterator it = set.iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry e = (Map.Entry)it.next();
+			System.out.println("이름 : " + e.getKey() + ", 점수 : " + e.getValue());
+		}
+		
+		set = map.keySet();
+		System.out.println("참가자 명단 : " + set);
+		
+		Collection values = map.values();
+		it = values.iterator();
+		
+		int total = 0;
+		
+		while(it.hasNext()) {
+			int i = (int)it.next();
+			total += i;
+		}
+		
+		System.out.println("총점 : " + total);
+		System.out.println("평균 : " + (double)total/set.size());
+		System.out.println("최고점수 : " + Collections.max(values));
+		System.out.println("최고점수 : " + Collections.min(values));
+	}
+}
+```
+```
+이름 : 안자바, 점수 : 90
+이름 : 김자바, 점수 : 100
+이름 : 강자바, 점수 : 80
+이름 : 이자바, 점수 : 100
+참가자 명단 : [안자바, 김자바, 강자바, 이자바]
+총점 : 370
+평균 : 92.5
+최고점수 : 100
+최고점수 : 80
+```
+
+#### HashMap 예제3
+
+```java
+public class HashMapTest3 {
+
+	public static void main(String[] args) {
+		String[] data = { "A","K","A","K","D","K","A","K","K","K","Z","D"};
+		
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		
+		for (int i = 0; i < data.length; i++) {
+			if(map.containsKey(data[i])) {
+				int value = map.get(data[i]);
+				map.put(data[i], value + 1);
+			}else {
+				map.put(data[i], 1);
+			}
+		}
+		
+		Iterator<?> it = map.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, Integer> entry = (Map.Entry)it.next();
+			int value = entry.getValue();
+			System.out.println(entry.getKey() + " : " 
+					+ printBar('#', value) + " " + value);
+		}
+	}
+
+	private static String printBar(char c, int value) {
+		// c가 value의 개수만큼
+		char[] cArr = new char[value];
+		
+		for (int i = 0; i < cArr.length; i++) {
+			cArr[i] = c;
+		}
+		
+		return new String(cArr);	// 이 부분 이해안감 내일 다시보기
+	}
+}
+```
+```
+A : ### 3
+D : ## 2
+Z : # 1
+K : ###### 6
+```
+
+### Collections 메서드
+
+* Arrays가 배열과 관련된 메서드를 제공하는 것처럼, Collections 메서드는 컬렉션과 관련된 메서드를 제공함.
+* 컬렉션의 동기화 synchronized 메서드를 제공함.
+  * Vector는 동기화가 되어있으나 ArraysList는 동기화를 제공하지않음.
+
+```java
+List syncList = Collections.synchronizedList(new ArrayList(...));
+```
+
+* 동기화되어있지 않은 new ArrayList 를 넣으면 동기화가능.
+
+* 다양한 Collections 메서드
+	* 컬렉션에 저장된 데이터를 보호하기위해 unmodifiable 을 사용하여 변경불가로 만들 수 있음.
+	* 객체 한 개만 저장할 때 singleton 을 사용하여 객체를 하나만 반환하게 만들 수 있음.
+	* 한 종류의 객체만 저장할 때는 checked 를 사용하여 한 종류의 객체만 저장할 수 있음.
+	* 존재하고 어떠한 역할을 하는지만 알아두자.(자주 쓰이지 않음)
+
+* addAll, rotate, swap, shuffle, sort, binarySearch, max, min, fill, nCopies 등등이 있음.
+* 자주 쓰이는 sort, max, min 은 잘알아두자.
+
+#### Collections 메서드 예제
+
+```java
+public class Collections {
+
+	public static void main(String[] args) {
+		
+		List<Integer> list = new ArrayList<Integer>();
+		
+		list.addAll(list);
+		System.out.println(list);
+		
+		list.add(1);
+		list.add(5);
+		list.add(4);
+		list.add(2);
+		list.add(7);
+		System.out.println(list);
+		
+		sort(list);
+		System.out.println(list);
+		
+		int max = max(list);
+		int min = min(list);
+		System.out.println(max + ", " + min);
+		
+	}
+}
+```
+```
+[]
+[1, 5, 4, 2, 7]
+[1, 2, 4, 5, 7]
+7, 1
+```
 
 </div>
 </details>
