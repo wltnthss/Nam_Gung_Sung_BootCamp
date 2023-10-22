@@ -3535,3 +3535,94 @@ public class Collections {
 
 </div>
 </details>
+
+<details>
+<summary style="font-size:20px">지네릭스</summary>
+<div markdown="1">
+
+### 지네릭스 (Generics)
+
+* 지네릭스는 다양한 타입의 객체들을 다루는 메서드나 컬렉션 클래스에 컴파일 시의 타입 체크를 해주는 기능임.
+* 지네릭스를 사용함으로써 얻는 장점
+  * 타입 안정성 제공.
+  * 타입체크와 형변환 생략으로 인한 코드 간결성
+  
+```java
+// 지네릭스 이전 Object 타입
+public class ArrayList extends AbstractList{
+	private transient Object[] elementData;
+	public boolean add(Object p) {...}
+	pubvlic Object get(int index) {...}
+}
+
+// 지네릭스 사용 
+public class ArrayList<E> extends AbstractList<E>{
+	private transient E[] elementData;
+	public boolean add(E o) { ... }
+	public E get(int index) {...}
+}
+```
+
+* 지네릭스 이전(JDK1.5이전)에는 Object 타입을 불가피하게 사용했지만, 지네릭스를 활용하면 원하는 타입을 지정하기만 하면 됨.
+
+```java
+class Tv {...}
+
+ArrayList<Tv> tvList = new ArrayList<Tv>();
+
+Tv t = tvList.get(0);
+```
+
+* 타입 변수 E 대신에 제 타입인 Tv를 대입해서 사용하고, Tv를 대입된 타입이라고 함.
+* 형변환 필요없이 지네릭스의 도움으로 바로 사용가능함.
+* 지네릭스를 사용하지 않는다면?
+
+```java
+class Tv {...}
+
+ArrayList list = new ArrayList<();
+
+Tv t = (Tv)list.get(0);
+```
+
+* 위의 예제와 같이 형변환을 명시해야 컴파일 에러가 나지 않음.
+
+#### 지네릭스 용어
+
+* 지네릭스의 용어들에 대한 정의를 정리하고 넘어가자.
+
+```java
+class Box<T> {}
+```
+
+* Box<T> : 지네릭 클래스, 'T의 Box' 또는 'T Box' 라고 읽음.
+* T : 타입 변수 또는 타입 매개변수라고함.
+* Box : 원시 타입
+
+#### 지네릭 타입과 다형성
+
+```java
+ArrayList<Tv> list = new ArrayList<Tv>();		// Ok
+ArrayList<Product> list = new ArrayList<Tv>();	// Error
+
+ArrayList<Tv> list = new ArrayList<Tv>();		// Ok
+ArrayList<Tv> list = new LinkedList<Tv>();		// Ok
+```
+
+* 클래스 Tv와 Product가 서로 상속관계에 있어도 일치해야함.
+* 클래스 타입 간에 다형성을 적용하는 것은 가능함. 이 때에도 지네릭 타입은 일치해야함.
+* 즉, 참조 변수와 생성자의 대입된 타입은 일치해야함.
+
+```java
+ArrayList<Product> list = new ArrayList<Product>();
+list.add(new Product());
+list.add(new Tv());
+list.add(new Audio());
+```
+
+* 매개변수의 다형성도 성립함.
+
+#### Iterator<E>
+
+</div>
+</details>
