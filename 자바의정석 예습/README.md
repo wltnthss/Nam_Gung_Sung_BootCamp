@@ -3622,7 +3622,133 @@ list.add(new Audio());
 
 * 매개변수의 다형성도 성립함.
 
-#### Iterator<E>
+#### 제한된 지네릭 클래스
+
+* 타입변수 T에 지정할 수 있는 타입의 종류를 제한함.
+
+```java
+class FruitBox<T extends Fruit>{
+	ArrayList<T> list = new ArrayList<T>();
+	...
+} 
+
+FruitBox<Apple> appleBox = new FruitBox<Apple>();	// Ok
+FruitBox<Toy> toyBox = new FruitBox<Toy>();			// 에러 Toy는 Fruit 자식이 아님.
+```
+
+```java
+class Fruit implements Eatable{
+	public String toString() {
+		return "Fruit";
+	}
+}
+class Apple extends Fruit { public String toString() {return "Apple";}}
+class Grape extends Fruit { public String toString() {return "Grape";}}
+class Toy { public String toString() { return "Toy";}} 
+
+interface Eatable {}
+
+public class Ex12_3 {
+
+	public static void main(String[] args) {
+		FruitBox<Fruit> fruitBox = new FruitBox<Fruit>();
+		FruitBox<Apple> appleBox = new FruitBox<Apple>();
+		FruitBox<Grape> grapeBox = new FruitBox<Grape>();
+		
+		fruitBox.add(new Fruit());
+		fruitBox.add(new Apple());
+		fruitBox.add(new Grape());
+		appleBox.add(new Apple());
+		grapeBox.add(new Grape());
+		
+		System.out.println("fruitBox-"+fruitBox);
+		System.out.println("appleBox-"+appleBox);
+		System.out.println("grapeBox-"+grapeBox);
+	}
+}
+
+class FruitBox<T extends Fruit & Eatable> extends Box<T>{
+	
+}
+
+class Box<T>{
+	ArrayList<T> list = new ArrayList<T>();
+	void add(T item) {list.add(item);}
+	T get(int i) {return list.get(i);}
+	int size() {return list.size();}
+	public String toString() {return list.toString();}
+}
+```
+```
+fruitBox-[Fruit, Apple, Grape]
+appleBox-[Apple]
+grapeBox-[Grape]
+
+```
+
+* interface. 구현시 & 기호로 연결함.
+* FruitBox는 Fruit 만 상속받고 있으므로 FruitBox<Toy> 이렇게 쓰면 에러.
+* 다형성에 의해서 appleBox에 Grape 객체를 담을 수 없고, grapeBox에 Apple 객체를 담을 수 없음. 
+
+#### 지네릭스 제약
+
+* 타입 변수에 대입은 인스턴스 별로 다르게 가능함.
+* static멤버에 타입 변수는 사용 불가함.
+* static은 모든 인스턴스 변수를 참조할 수 없음.
+* 배열 생성할 때 타입 변수 사용불가. 타입 변수로 배열 선언은 가능함.
+
+```java
+class Box<T> {
+	T[] itemArr;
+	...
+	T[] toArray(){
+		T[] tmpArr = new T[itemArr.length];	// 에러
+	}
+}
+```
+* new연산자 때문에 컴파일 시점에 타입T가 뭔지 정확히 알아야하기때문에 사용할 수 없음.
+
+#### 와일드카드
+
+* 하나의 참조 변수로 대입된 타입이 다른 객체를 참조 가능함.
+
+```java
+ArrayList<Product> list = new ArrayList<Tv>();
+```
+
+* 위의 예제처럼 일치하지 않으면 컴파일 에러가 발생함.
+* 지네릭 타입에도 다형성을 적용할 방법은 없을까?? 해서 사용 한 것이 와일드카드.
+
+```java
+<? extends T> - 와일드 카드의 상한 제한. T와 자손들만 가능
+<? super T> - 와일드 카드의 하한 제한. T와 조상들만 가능
+<?> - 제한 없음. 모든 타입이 가능 <? extends Object> 와 동일함.
+```
+
+```java
+ArrayList<? extends Product> list = new ArrayList<Tv>();		// Ok
+ArrayList<? extends Product> list = new ArrayList<Audio>();		// Ok
+```
+
+* 지네릭 타입이 <? extends Product> 이면 Product와 Product의 모든 자식이 가능함.
+
+#### 지네릭 메서드
+
+* 지네릭 타입이 선언된 메서드
+
+```java
+class FruitBox<T> {
+	...
+	static <T> void sort<List<T> list, Comparator<? super T> c){
+		...
+	}
+}
+```
+
+* 클래스 타입 매개변수<T> 와 메서드의 타입 매개변수 <T>는 별개, 인스턴스 변수와 지역변수 개념과 유사.
+* 호출할 때마다 타입을 대입해야함(생략 가능)
+* 와일드 카드는 하나의 참조변수로 서로 다른 타입이 대입된 여러 지네릭 객체를 다루기 위함.
+* 지네릭 메서드는 메서드를 호출할 때마다 다른 지네릭 타입을 대입할 수 있게 하기 위함.
 
 </div>
 </details>
