@@ -3750,5 +3750,113 @@ class FruitBox<T> {
 * 와일드 카드는 하나의 참조변수로 서로 다른 타입이 대입된 여러 지네릭 객체를 다루기 위함.
 * 지네릭 메서드는 메서드를 호출할 때마다 다른 지네릭 타입을 대입할 수 있게 하기 위함.
 
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">열거형, 애너테이션</summary>
+<div markdown="1">
+
+### 열거형
+
+* 관련된 여러 상수를 같이 묶어 놓은 것. 타입에 안전한 열거형을 제공하기위함.
+* 자바의 열거형은 값하고 열거형을 모두 체크함.
+
+```java
+// 상수방식
+class Card{
+	static final int CLOVER = 0;
+	static final int HEART = 1;
+	static final int DIAMOND = 2;
+	static final int SPADE = 3;
+
+	static final int TWO = 0;
+	static final int THREE = 1;
+	static final int FOUR = 2;
+
+	final int kind;
+	final int num;
+}
+// enum 사용방식
+class Card{
+	enum Kind {CLOVER, HEART, DIAMOND, SPADE}
+	enum Value {TWO, THREE, FOUR}
+
+	final Kind kind;
+	final Value value;
+}
+
+if(Card.Kind.CLOVER == Card.Value.TWO){		// 컴파일에러
+	...
+}
+```
+
+* 열거형을 이용해서 상수를 정의한 경우는 타입을 먼저 비교하므로 컴파일 에러 발생
+* 열거형 상수에 비교연산자는 사용불가하며 compareTo로 비교 가능함.
+
+### 열거형에 멤버 추가
+
+* Enum 클래스에 정의된 ordinal()이 열거형 상수가 정의된 순서를 반환하지만, 열거형 상수의 값으로 사용하지 않는 것이 좋음.
+* 내부적인 용도로만 사용되기 때문임.
+* 열거형 상수 값이 불규칙적인 경우에는 열거형 상수의 이름 옆에 원하는 값을 괄호()와 함께 적으면됨.
+* 먼저 열거형 상수를 모두 정의한 다음에 다른 멤버들을 추가해야하며, 인스턴스 변수와 생성자도 새로 추가해 주어야함..
+  
+#### 열거형 예제1
+
+```java
+enum Direction { 
+	EAST, SOURTH, WEST, NORTH;
+}
+
+public class EnumTest {
+
+	public static void main(String[] args) {
+		Direction d = Direction.EAST;
+		System.out.println(d);
+		
+		for (Direction dArr : Direction.values()) {
+			System.out.println(dArr + ", " + dArr.ordinal());
+		}
+	}
+}
+```
+```
+EAST
+EAST, 0
+SOURTH, 1
+WEST, 2
+NORTH, 3
+```
+
+* d를 호출하면 EAST가 바로 나오고, Direction.values 를 활용하면 Direction들의 배열들을 꺼내어 쓸 수있음.
+* 0 번째부터 순서를 알고 싶으면 ordinal을 사용하면됨.
+
+### 애너테이션
+
+* 주석처럼 프로그래밍 언어에 영향을 미치지 않으며, 유용한 정보를 제공함.
+  
+```java
+@Test
+public void method(){
+	...
+}
+```
+
+* 단순히 테스트를 위한 메서드임을 알려주는 애너테이션
+
+#### @Deprecated
+
+* 더 이상 사용되지 않는 필드나 메서드에 사용함으로써 더 이상 사용하지 않을 것을 권한다는 의미의 애너테이션.
+
+#### @FunctionalInterface
+
+* 함수형 인터페이스를 올바르게 선언했는지를 확인하고, 잘못된 경우 에러를 발생시키는 애너테이션.
+
+#### @SuppressWarnings
+
+* 컴파일러가 보여주는 경고메시지가 나타나지 않게 억제시켜주는 애너테이션.
+
+
 </div>
 </details>
