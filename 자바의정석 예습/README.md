@@ -3622,7 +3622,241 @@ list.add(new Audio());
 
 * 매개변수의 다형성도 성립함.
 
-#### Iterator<E>
+#### 제한된 지네릭 클래스
+
+* 타입변수 T에 지정할 수 있는 타입의 종류를 제한함.
+
+```java
+class FruitBox<T extends Fruit>{
+	ArrayList<T> list = new ArrayList<T>();
+	...
+} 
+
+FruitBox<Apple> appleBox = new FruitBox<Apple>();	// Ok
+FruitBox<Toy> toyBox = new FruitBox<Toy>();			// 에러 Toy는 Fruit 자식이 아님.
+```
+
+```java
+class Fruit implements Eatable{
+	public String toString() {
+		return "Fruit";
+	}
+}
+class Apple extends Fruit { public String toString() {return "Apple";}}
+class Grape extends Fruit { public String toString() {return "Grape";}}
+class Toy { public String toString() { return "Toy";}} 
+
+interface Eatable {}
+
+public class Ex12_3 {
+
+	public static void main(String[] args) {
+		FruitBox<Fruit> fruitBox = new FruitBox<Fruit>();
+		FruitBox<Apple> appleBox = new FruitBox<Apple>();
+		FruitBox<Grape> grapeBox = new FruitBox<Grape>();
+		
+		fruitBox.add(new Fruit());
+		fruitBox.add(new Apple());
+		fruitBox.add(new Grape());
+		appleBox.add(new Apple());
+		grapeBox.add(new Grape());
+		
+		System.out.println("fruitBox-"+fruitBox);
+		System.out.println("appleBox-"+appleBox);
+		System.out.println("grapeBox-"+grapeBox);
+	}
+}
+
+class FruitBox<T extends Fruit & Eatable> extends Box<T>{
+	
+}
+
+class Box<T>{
+	ArrayList<T> list = new ArrayList<T>();
+	void add(T item) {list.add(item);}
+	T get(int i) {return list.get(i);}
+	int size() {return list.size();}
+	public String toString() {return list.toString();}
+}
+```
+```
+fruitBox-[Fruit, Apple, Grape]
+appleBox-[Apple]
+grapeBox-[Grape]
+
+```
+
+* interface. 구현시 & 기호로 연결함.
+* FruitBox는 Fruit 만 상속받고 있으므로 FruitBox<Toy> 이렇게 쓰면 에러.
+* 다형성에 의해서 appleBox에 Grape 객체를 담을 수 없고, grapeBox에 Apple 객체를 담을 수 없음. 
+
+#### 지네릭스 제약
+
+* 타입 변수에 대입은 인스턴스 별로 다르게 가능함.
+* static멤버에 타입 변수는 사용 불가함.
+* static은 모든 인스턴스 변수를 참조할 수 없음.
+* 배열 생성할 때 타입 변수 사용불가. 타입 변수로 배열 선언은 가능함.
+
+```java
+class Box<T> {
+	T[] itemArr;
+	...
+	T[] toArray(){
+		T[] tmpArr = new T[itemArr.length];	// 에러
+	}
+}
+```
+* new연산자 때문에 컴파일 시점에 타입T가 뭔지 정확히 알아야하기때문에 사용할 수 없음.
+
+#### 와일드카드
+
+* 하나의 참조 변수로 대입된 타입이 다른 객체를 참조 가능함.
+
+```java
+ArrayList<Product> list = new ArrayList<Tv>();
+```
+
+* 위의 예제처럼 일치하지 않으면 컴파일 에러가 발생함.
+* 지네릭 타입에도 다형성을 적용할 방법은 없을까?? 해서 사용 한 것이 와일드카드.
+
+```java
+<? extends T> - 와일드 카드의 상한 제한. T와 자손들만 가능
+<? super T> - 와일드 카드의 하한 제한. T와 조상들만 가능
+<?> - 제한 없음. 모든 타입이 가능 <? extends Object> 와 동일함.
+```
+
+```java
+ArrayList<? extends Product> list = new ArrayList<Tv>();		// Ok
+ArrayList<? extends Product> list = new ArrayList<Audio>();		// Ok
+```
+
+* 지네릭 타입이 <? extends Product> 이면 Product와 Product의 모든 자식이 가능함.
+
+#### 지네릭 메서드
+
+* 지네릭 타입이 선언된 메서드
+
+```java
+class FruitBox<T> {
+	...
+	static <T> void sort<List<T> list, Comparator<? super T> c){
+		...
+	}
+}
+```
+
+* 클래스 타입 매개변수<T> 와 메서드의 타입 매개변수 <T>는 별개, 인스턴스 변수와 지역변수 개념과 유사.
+* 호출할 때마다 타입을 대입해야함(생략 가능)
+* 와일드 카드는 하나의 참조변수로 서로 다른 타입이 대입된 여러 지네릭 객체를 다루기 위함.
+* 지네릭 메서드는 메서드를 호출할 때마다 다른 지네릭 타입을 대입할 수 있게 하기 위함.
+
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">열거형, 애너테이션</summary>
+<div markdown="1">
+
+### 열거형
+
+* 관련된 여러 상수를 같이 묶어 놓은 것. 타입에 안전한 열거형을 제공하기위함.
+* 자바의 열거형은 값하고 열거형을 모두 체크함.
+
+```java
+// 상수방식
+class Card{
+	static final int CLOVER = 0;
+	static final int HEART = 1;
+	static final int DIAMOND = 2;
+	static final int SPADE = 3;
+
+	static final int TWO = 0;
+	static final int THREE = 1;
+	static final int FOUR = 2;
+
+	final int kind;
+	final int num;
+}
+// enum 사용방식
+class Card{
+	enum Kind {CLOVER, HEART, DIAMOND, SPADE}
+	enum Value {TWO, THREE, FOUR}
+
+	final Kind kind;
+	final Value value;
+}
+
+if(Card.Kind.CLOVER == Card.Value.TWO){		// 컴파일에러
+	...
+}
+```
+
+* 열거형을 이용해서 상수를 정의한 경우는 타입을 먼저 비교하므로 컴파일 에러 발생
+* 열거형 상수에 비교연산자는 사용불가하며 compareTo로 비교 가능함.
+
+### 열거형에 멤버 추가
+
+* Enum 클래스에 정의된 ordinal()이 열거형 상수가 정의된 순서를 반환하지만, 열거형 상수의 값으로 사용하지 않는 것이 좋음.
+* 내부적인 용도로만 사용되기 때문임.
+* 열거형 상수 값이 불규칙적인 경우에는 열거형 상수의 이름 옆에 원하는 값을 괄호()와 함께 적으면됨.
+* 먼저 열거형 상수를 모두 정의한 다음에 다른 멤버들을 추가해야하며, 인스턴스 변수와 생성자도 새로 추가해 주어야함..
+  
+#### 열거형 예제1
+
+```java
+enum Direction { 
+	EAST, SOURTH, WEST, NORTH;
+}
+
+public class EnumTest {
+
+	public static void main(String[] args) {
+		Direction d = Direction.EAST;
+		System.out.println(d);
+		
+		for (Direction dArr : Direction.values()) {
+			System.out.println(dArr + ", " + dArr.ordinal());
+		}
+	}
+}
+```
+```
+EAST
+EAST, 0
+SOURTH, 1
+WEST, 2
+NORTH, 3
+```
+
+* d를 호출하면 EAST가 바로 나오고, Direction.values 를 활용하면 Direction들의 배열들을 꺼내어 쓸 수있음.
+* 0 번째부터 순서를 알고 싶으면 ordinal을 사용하면됨.
+
+### 애너테이션
+
+* 주석처럼 프로그래밍 언어에 영향을 미치지 않으며, 유용한 정보를 제공함.
+  
+```java
+@Test
+public void method(){
+	...
+}
+```
+
+* 단순히 테스트를 위한 메서드임을 알려주는 애너테이션
+
+#### @Deprecated
+
+* 더 이상 사용되지 않는 필드나 메서드에 사용함으로써 더 이상 사용하지 않을 것을 권한다는 의미의 애너테이션.
+
+#### @FunctionalInterface
+
+* 함수형 인터페이스를 올바르게 선언했는지를 확인하고, 잘못된 경우 에러를 발생시키는 애너테이션.
+
+#### @SuppressWarnings
+
+* 컴파일러가 보여주는 경고메시지가 나타나지 않게 억제시켜주는 애너테이션.
+
 
 </div>
 </details>
