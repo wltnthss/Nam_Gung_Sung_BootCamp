@@ -3846,7 +3846,7 @@ public void method(){
 * 단순히 테스트를 위한 메서드임을 알려주는 애너테이션
 
 #### @Deprecated
-
+  
 * 더 이상 사용되지 않는 필드나 메서드에 사용함으로써 더 이상 사용하지 않을 것을 권한다는 의미의 애너테이션.
 
 #### @FunctionalInterface
@@ -3857,6 +3857,182 @@ public void method(){
 
 * 컴파일러가 보여주는 경고메시지가 나타나지 않게 억제시켜주는 애너테이션.
 
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">프로세스와 쓰레드</summary>
+<div markdown="1">
+
+### 프로세스와 쓰레드
+
+* 프로세스 : 실행중인 프로그램 , 프로그램을 실행하면 OS로부터 실행에 필요한 자원을 할당받아 프로세스가 됨.
+* 프로세스는 프로그램을 수행하는 데 필요한 데이터와 메모리 등의 자원, 쓰레드로 구성되어있음.
+* 쓰레드 : 프로세스의 자원을 이용해서 실제로 작업을 수행하는 것.
+* 프로세스는 하나 이상의 쓰레드가 존재하며 둘 이상의 쓰레드를 가진 프로세스를 멀티쓰레드 프로세스라고 함.
+* ex) 프로세스 : 쓰레드 = 공장 : 일꾼
+
+#### 멀티쓰레딩의 장단점
+
+**멀티쓰레딩의 장점**
+* CPU의 사용률을 향상시킴.
+* 자원을 보다 효율적으로 사용할 수 있음.
+* 사용자에 대한 응답성이 향상됨.
+* 작업이 분리되어 코드가 간결해짐.
+
+* 메신저로 채팅하며 파일을 다운받거나 음성대화를 나누는 것이 가능한 이유가 멀티쓰레드로 작성되어 있기 때문임.
+* 하나의 서버 프로세스가 여러 개의 쓰레드를 생성해서 쓰레드와 사용자의 요청이 일대일로 처리되도록 프로그래밍해야함.
+* 하지만 멀티쓰레딩은 쓰레드가 같은 프로세스 내에서 자원을 공유하며 작업하므로 동기화, 교착상태와 같은 문제를 고려하며 프로그래밍해야함.
+* 두 개의 쓰레드로 작업한 시간이 싱글쓰레드로 작업한 시간이 더 걸림.
+  * 쓰레드간의 작업 전환에 시간이 더 걸리기 때문임.
+  * 작업 전환을 할 때는 작업의 상태, PC 등의 정보를 저장하고 있어 읽어 오는 시간이 더 소요됨.
+
+#### 쓰레드의 구현과 실행
+
+* 쓰레드를 구현하는 방법은 Thread 클래스를 상속받는 방법과 Runnable 인터페이스를 구현하는 방법 두 가지가 있음.
+  * 일반적으로 Runnable 인터페이스 방식이 더 자주 쓰이고 좋은 방식 (Thread 단일 상속만 가능하기에)
+* Runnable 인터페이스를 구현하는 방법은 재사용성이 높고, 코드의 일관성을 유지할 수 있어 객체지향적인 방법임.
+
+```java
+// Thread 상속
+class MyThread extends Thread{
+	public void run() {...}	// Thread 클래스의 run() 을 오버라이딩
+}
+
+// Runnable 인터페이스 구현
+class MyThread implements Runnable {
+	public void run() {...} // Runnable 인터페이스 run() 구현
+}
+
+public interface Runnable{
+	public abstract void run();
+}
+```
+
+* Ruunable 인터페이스는 오로지 run() 만 정의되어 있는 간단한 인터페이스임.
+* Runnable 인터페이스를 구현하기 위해서는 추상메서드인 run() 몸통을 만들어주는 것.
+
+#### 쓰레드의 구현과 실행 예제
+
+```java
+package ch13;
+
+public class Ex13_1 {
+
+	public static void main(String[] args) {
+		
+		ThreadEx1_1 t1 = new ThreadEx1_1();
+		
+		Runnable r = new ThreadEx1_2();
+		Thread t2 = new Thread(r);
+		// Thread.t2 = new Thread(new ThreadEx1_2());
+		
+		t1.start();
+		t2.start();
+	}
+}
+
+class ThreadEx1_1 extends Thread{
+	@Override
+	public void run() {
+		for (int i = 0; i < 5; i++) {
+			System.out.println(Thread.currentThread().getName());
+		}
+	}
+}
+
+class ThreadEx1_2 implements Runnable{
+
+	@Override
+	public void run() {
+		for (int i = 0; i < 5; i++) {
+			System.out.println(Thread.currentThread().getName());
+		}
+	}
+}
+```
+```
+Thread-0
+Thread-1
+Thread-1
+Thread-1
+Thread-1
+Thread-1
+Thread-0
+Thread-0
+Thread-0
+Thread-0
+```
+
+* Runnable과 Thread를 상속받았을 때의 차이점과 사용방법을 알아두자.
+* start() 가 호출된 후 실행대기의 상태에 있다가 자신의 차례가 오면 실행됨.
+* 한 번 실행이 종료된 쓰레드는 다시 실행할 수 없기에 새로운 쓰레드를 생성한 후에 다시 start()를 호출해야되는점 알아두자.
+  * 두 번 실행했을 때 IllegalThreadStateException 오류가 발생함.
+
+#### start() 와 run()
+
+* start() 를 호출해야 하나의 새로운 쓰레드가 생기고 그 호출스택에 run()이 실행되는 것.
+* 쓰레드를 실행시킬 때 왜 run() 이 아닌 start() 를 호출할까? 쓰레드가 실행되는 과정을 알아보자.
+
+![Alt text](image-12.png)
+
+**실행흐름**
+
+1. main 메서드에서 쓰레드의 start() 를 호출.
+2. start()는 새로운 쓰레드를 생성하고, 쓰레드가 작업하는데 사용될 호출스택을 생성함.
+3. 새로 생성된 호출스택에 run()이 호출되어, 쓰레드가 독립된 공간에서 작업을 수행함.
+4. 호출스택이 2개이므로 스케줄러가 정한 순서에 의해 번갈아 가면서 수행됨.
+
+* 실행순서는 OS의 스케쥴러에 의해서 실행순서가 결정됨.
+* run() 수행이 종료된 쓰레드는 호출스택이 모두 비워지고 쓰레드가 사용하던 호출스택은 사라짐.
+* 메인쓰레드가 종료되도 쓰레드가 종료되지 않으면 프로그램은 종료되지않음.
+
+### 쓰레드의 I/O 블락킹
+
+![Alt text](image-13.png)
+
+* 싱글 쓰레드의 블락 구간에서는 아무 일도 하지 못하는 반면
+* 멀티 쓰레드는 입력을 기다리는 구간, 다른 쓰레드를 수행함으로써 효울적인 CPU 사용이 가능함.
+
+#### 쓰레드의 I/O 블락킹 예제
+
+```java
+package ch13;
+
+import javax.swing.JOptionPane;
+
+public class Ex13_5 {
+
+	public static void main(String[] args) {
+		ThreadEx5_1 t1 = new ThreadEx5_1();
+		t1.start();
+		
+		String input = JOptionPane.showInputDialog("아무 값이나 입력하세요.");
+		System.out.println("입력하신 값은 " + input + "입니다.");
+	}
+}
+
+class ThreadEx5_1 extends Thread{
+	@Override
+	public void run() {
+		for (int i = 10; i > 0; i--) {
+			System.out.println(i);
+			try {
+				sleep(1000);
+			} catch (Exception e) {
+			}
+		}
+	}
+}
+
+```
+
+![Alt text](image-14.png)
+
+* 멀티쓰레드로서 구현했을 때 입력을 기다리면서도 값을 입력하면 console창에 입력한 값이 나올 수 있는 기능을 하는 반면
+* 싱글쓰레드는 사용자가 입력을 마치기 전까지는 화면에 숫자가 출력되지 않다가 사용자가 입력을 마치고 나서야 화면에 숫자가 출력됨.
+
+### 쓰레드의 우선순위
 
 </div>
 </details>
