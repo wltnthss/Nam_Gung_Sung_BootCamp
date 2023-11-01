@@ -4034,5 +4034,282 @@ class ThreadEx5_1 extends Thread{
 
 ### 쓰레드의 우선순위
 
+* 쓰레드는 우선순위라는 속성(멤버변수)을 가지고 있어 이 우선순위의 값에 따라 쓰레드가 얻는 실행시간이 달라짐.
+* 쓰레드의 우선순위를 다르게 함으로써 특정 쓰레드가 더 많은 작업시간을 갖도록 할 수 있음.
+  * ex) 파일 다운로드하는 쓰레드보다 채팅하는 쓰레드 우선순위를 높게 설정하는 경우
+
+```java
+void setPriority(int newPriority)
+int getPriority()
+
+public static final int MAX_PRIORITY = 10	// 최대 우선순위
+public static final int MIN_PRIORITY = 1	// 최소 우선순위
+public static final int NORM_PRIORITY = 5	// 보통 우선순위
+```
+
+* 쓰레드가 가질 수 있는 우선순위 범위는 1~10이며 숫자가 높을수록 우선순위가 높음.
+* main메서드를 수행하는 쓰레드는 우선순위가 5이므로 main내에서 생성하는 쓰레드의 우선순위는 자동적으로 5가 됨.
+
+```java
+package ch13;
+
+public class Ex13_6 {
+
+	public static void main(String[] args) {
+		
+		ThreadEx6_1 ex6_1 = new ThreadEx6_1();
+		ThreadEx6_2 ex6_2 = new ThreadEx6_2();
+		
+		ex6_2.setPriority(7);
+		
+		System.out.println("Priority of 6_1 th(-) : " + ex6_1.getPriority());
+		System.out.println("Priority of 6_2 th(|) : " + ex6_2.getPriority());
+		ex6_1.start();
+		ex6_2.start();
+	}
+}
+
+class ThreadEx6_1 extends Thread{
+	@Override
+	public void run() {
+		for (int i = 0; i < 100; i++) {
+			System.out.print("-");
+			for (int j = 0; j < 100000; j++) {	// 시간 지연용
+				
+			}
+		}
+	}
+}
+
+class ThreadEx6_2 extends Thread{
+	@Override
+	public void run() {
+		for (int i = 0; i < 100; i++) {
+			System.out.print("|");
+			for (int j = 0; j < 100000; j++) {	// 시간 지연용
+				
+			}
+		}
+	}
+}
+```
+```
+Priority of 6_1 th(-) : 5
+Priority of 6_2 th(|) : 7
+-|-|-|-||||-|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-----------------------------------------------------------------------------------------------
+```
+
+* ex6_1, ex6_2 모두 main에서 생성하였기에 우선순위인 5를 상속받음.
+* 그 후 ex6_2 의 우선순위를 setPriority를 통해 7로 변경한 다음 start를 호출하여 쓰레드를 실행함.
+* 쓰레드를 실행하기 전에만 우선순위를 변경할 수 있는점을 기억하자.
+* 이론적으로는 우선순위가 높은 ex6_2의 쓰레드 종료시간이 더 빠름.
+  * 1~10은 JVM에서 정해놓은 우선순위이고 OS에서는 32단계로 달라 희망사항을 스케쥴러에게 전달할 뿐임.
+  * OS 스케쥴러가 참고해본다는 수준에 불과함.
+
+#### 쓰레드 그룹
+
+* 쓰레드 그룹은 서로 관련된 쓰레드를 그룹으로 다루기 위한 것임.
+* 모든 쓰레드는 반드시 하나의 쓰레드 그룹에 포함되어 있어야함.
+* 쓰레드 그룹을 지정하지 않고 생성한 쓰레드는 main 쓰레드 그룹에 속함.
+* 자신을 생성한 쓰레드의 그룹과 우선순위를 상속받음.
+
+```java
+// 생성자
+ThreadGroup(String name)
+ThreadGroup(ThreadGroup parent, String name)
+// 활성상태 쓰레드 수, 그룹 수 반환
+int activeCount()
+int activerGroupCount()
+```
+
+### 데몬 쓰레드
+
+* 일반 쓰레드의 작업을 돋는 보조적인 역할을 수행함.
+* 일반 쓰레드가 모두 종료되면 데몬 쓰레드는 자동적으로 종료됨.
+* 데몬 쓰레드는 가비지 컬렉터, 워드프로세서 자동저장, 화면자동갱신 등이 있음.
+* 무한 루프와 조건문을 이용해서 실행 후 대기하다가 특정 조건이 만족되면 작업을 수행하고 다시 대기하도록 작성함.
+
+```java
+public void run(){
+	while(true){
+		try{
+			Thread.sleep(3 * 1000);
+		}catch(InterruptedException e){
+
+		}
+		if(autoSave) autoSave();
+	}
+}
+
+// 데몬 쓰레드 메서드
+boolean isDaemon()
+void setDaemon(boolean on)
+```
+
+* 무한루프와 특정조건을 활용하여 데몬 쓰레드를 작성한다는 것 알아두자.
+* 쓰레드를 생성한 다음 실행(start()를 호출하기 전)에 setDaemon(true)을 실행해야함.
+  * 그렇지 않으면 IllegalThreadStateException 발생
+
+### 데몬 쓰레드 예제
+
+```java
+package ch13;
+
+public class Ex13_7 implements Runnable{
+
+	static boolean autoSave = false;
+	
+	public static void main(String[] args) {
+		// 메인쓰레드
+		Thread t = new Thread(new Ex13_7());
+		t.setDaemon(true);	// 이 부분이 없으면 종료되지 않음.
+		t.start();
+		
+		for (int i = 0; i <= 10; i++) {
+			try {
+				Thread.sleep(1000);
+			}catch (InterruptedException e) {
+				
+			}
+			System.out.println(i);
+			
+			if(i==5) {
+				autoSave = true;
+			}
+		}
+		System.out.println("프로그램 종료");
+	}
+
+	// 데몬 쓰레드(보조) - 일반쓰레드가 하나도 없을 때 같이 종료됨.
+	@Override
+	public void run() {
+		while(true) {
+			try {
+				Thread.sleep(3*1000);
+			} catch (InterruptedException e) {
+				
+			}
+			if(autoSave) {
+				autoSave();
+			}
+		}
+	}
+	public void autoSave() {
+		System.out.println("작업파일 자동저장완료");
+	}
+}
+```
+```
+0
+1
+2
+3
+4
+5
+6
+7
+작업파일 자동저장완료
+8
+9
+10
+프로그램 종료
+```
+
+* 3초마다 변수 autoSave를 확인해서 true이면 자동 저장 메서드를 반복하는 데몬쓰레드를 작성함.
+* 만일 이 쓰레드를 데몬 쓰레드로 설정하지 않았다면, 이 프로그램은 강제종료하지 않는 한 영원히 종료되지 않았을 것임.
+  * 데몬쓰레드 역할이 t.setDaemon(true) 이 부분임.
+
+### 쓰레드의 상태
+
+**쓰레드의 상태**
+
+![Alt text](image-15.png)
+
+**쓰레드 변화과정**
+
+![Alt text](image-16.png)
+
+1. 쓰레드를 생성(NEW)하고 start() 를 호출한다고해서 바로 실행되지않음. 
+	* 실행대기열에 저장되어 자신의 차례가 될 때까지 기다려야하며, 큐 자료구조의 상태로 먼저 실행대기열에 들어온 쓰레드가 먼저 실행됨.
+2. 실행대기상태(RUNNABLE)에 있다가 자신의 차례가 되면 실행상태가 됨.
+3. 주어진 실행시간이 다되거나 yield()를 만나면 다시 실행대기상태가 되고 다음 차례의 쓰레드가 실행상태가 됨.
+4. 실행중에 suspend(), sleep(), wait(), join(), I/O block에 의해 일시정지상태(WAITING, BLOCKED) 가 될 수 있음
+   * I/O block은 입출력작업에서 발생하는 지연상태를 말함. 사용자의 입력이 끝나면 다시 실행대기상태가됨.
+5. 지정된 일시정지시간이 다되거나(time-out), notify(), resume(), interrupt() 가 호출되면 일지정지상태를 벗어나 다시 실행대기열에서 자신의 차례를 기다림.
+6. 실행을 모두 마치거나 stop()이 오출되면 쓰레드는 소멸됨.
+
+* 그네타기에 비유, 일시정지는 벤치에서 쉬는 상태에 비유해서 알고있자.
+
+### 쓰레드의 실행제어
+
+![Alt text](image-17.png)
+
+* **static** sleep - 쓰레드 일시정지(잠듬), 지정한 시간 지나면 자동 실행대기상태 
+* join - 지정된 시간동안 쓰레드 실행, (다른 쓰레드 기다리기)
+* interrupt - 자고 있거나 기다리고 있는 것 깨우기, 실행대기상태로 만듬
+* stop - 쓰레드 즉시 종료
+* suspend - 일시정지
+* resume - 일시정지 실행대기상태
+* **yield** - 실행시간 다른 쓰레드에게 양보 후 자신은 실행대기상태
+
+* static이 붙은 sleep과 yield 는 자기 자신에게만 호출이 가능함.
+
+#### sleep()
+
+* 현재 쓰레드에 지정된 시간동안 멈추게함.
+* 예외처리를 해야함. (InterrupedException) 은 Exception의 자손이므로 필수로 예외처리를 해주어야함.
+* 자기 자신에게 적용되는 메서드임.
+
+```java
+// 3초면 3*1000 을 지정함.
+static void sleep(long millis)
+
+// 예외처리 대신 메서드 사용(매번 try catch 해줘야하기에)
+void delay(long millis){
+	try{
+		Thread.sleep(millis);
+	}catch(InterruptedException e){
+
+	}
+}
+```
+
+#### interrupt()
+
+* 대기상태(WAITING)인 쓰레드를 실행대기 상태(RUNNABLE)로 만듬.
+  * sleep, join, wait에 의해 작업이 중단된 상태
+
+
+```java
+void interrupt()				// false -> true 변경
+boolean isInterrupted()			// 쓰레드 interrupted 상태 반환
+static boolean interrupted()	// false 초기화
+```
+
+#### suspend(), resume(), stop()
+
+* suspend()는 sleep()처럼 쓰레드를 멈추게하며, 정지된 쓰레드는 resume()을 통해 다시 실행대기 상태가됨.
+* stop()은 호출되는 즉시 쓰레드가 종료됨.
+* 교착상태에 빠지기 쉬워 deprecated 된 상태임.
+
+#### join() 과 yield()
+
+**join()**
+
+* 쓰레드 자신이 하던 작업을 잠시 멈추고 다른 쓰레드가 지정된 시간동안 작업을 수행하도록 할 떄 join()을 사용함.
+* 시간을 지정하지 않으면, 해당 쓰레드가 모두 마칠 때 까지 기다리게됨.
+* 작업 중에 다른 쓰레드의 작업이 먼저 수행되어야할 필요가 있을 때 join()을 사용함.
+* join() 도 sleep() 처럼 대기상태에서 벗어날 수 있고 try-catch문으로 감싸야함.
+* sleep() 과 달리 특정 쓰레드에 대해 동작하므로 static 메서드가 아님.
+
+**yield()**
+
+* 쓰레드 자신에게 주어진 실행시간을 다음 차례의 쓰레드에게 양보함.
+* 예를 들어 스케쥴러에 의해 1초의 실행시간을 할당받은 쓰레드가 0.5초 시간동안 작업한 상태에서 yield()가 호출되면 나머지 0.5초는 포기하고 다시 실행대기상태가됨.
+* yield() 와 interrupt()를 적절히 사용하면 효율적인 실행이 가능함.
+
+### 쓰레드의 동기화(synchronization)
+
+
 </div>
 </details>
