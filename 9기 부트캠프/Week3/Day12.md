@@ -30,3 +30,109 @@
 * 어떤 타입에 대한 instanceof 연산의 결과가 true 라는 것은 검사한 타입으로 형변환이 가능하다는 것을 뜻함.
 * super.x, child.x, super.method(), this.method() 가 있으면 최신으로 오버라이딩된 자식의 메서드가 호출됨.
 * 객체 배열 예제 다시 풀어보기.
+
+### 객체 배열 예제
+
+```java
+
+// 부모클래스  Fruit 생성
+public class Fruit {
+	
+	String name;
+	int price;
+	int fresh;
+	int bP;
+	
+	public Fruit() {
+		price = 0;
+		fresh = 0;
+	}
+
+	public Fruit(int price, int fresh) {
+		this.price = price;
+		this.fresh = fresh;
+		bP = (int)price / 10;
+	}
+}
+
+// 자식 클래스 Grape
+public class Grape extends Fruit{
+	
+	public Grape() {
+		super(3000, 65);
+	}
+
+	@Override
+	public String toString() {
+		return "Grape";
+	}
+}
+
+// 자식 클래스 Apple
+public class Apple extends Fruit{
+
+	public Apple() {
+		super(2000, 90);
+	}
+
+	@Override
+	public String toString() {
+		return "Apple";
+	}
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+// 구매자 클래스
+public class Buyer {
+
+	int money = 10000;
+	int bP;
+	List<Fruit> list = new ArrayList<Fruit>();
+	
+	public void buy(Fruit f) {
+		if(f.price > money) {
+			System.out.println("잔고가 부족합니다.");
+			System.out.println(f + "을/를 구입하려면 "+f.price+"원이 필요합니다.");
+			return;
+		}
+		money = money - f.price;
+		bP = bP + f.bP;
+		list.add(f);
+		System.out.println(f+"을/를 구입하셨습니다.");
+	}
+	
+	public void summary() {
+		int sum = 0;
+		String itemList = "";
+		int gCnt  = 0;
+		int aCnt  = 0;
+		
+		for (Fruit fruit : list) {
+			sum += fruit.price;
+			itemList += fruit + " ";
+			if(fruit.toString().equals("Grape")) {
+				gCnt++;
+			}else if(fruit.toString().equals("Apple")) {
+				aCnt++;
+			}
+		}
+		
+		System.out.println("현재 잔액은 "+money+"원 이고, 포인트는 "+bP+"입니다.");
+		System.out.println("구입하신 총 금액은 " +sum+ "원 입니다.");
+		System.out.print("구입하신 물건 리스트는 총 "+list.size()+"개 이며,");
+		System.out.print("사과가 "+aCnt+"개 이고, 포도는 " +gCnt+"개 입니다.");
+	}
+}
+```
+```
+Grape을/를 구입하셨습니다.
+Apple을/를 구입하셨습니다.
+Apple을/를 구입하셨습니다.
+Grape을/를 구입하셨습니다.
+
+현재 잔액은 0원 이고, 포인트는 1000입니다.
+구입하신 총 금액은 10000원 입니다.
+구입하신 물건 리스트는 총 4개 이며,사과가 2개 이고, 포도는 2개 입니다.
+```
