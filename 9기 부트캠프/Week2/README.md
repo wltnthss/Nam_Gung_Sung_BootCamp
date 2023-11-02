@@ -329,6 +329,8 @@ public class Main {
 ```
 
 * 다중 인터페이스들 간의 디폴트 메서드 충돌
+* 똑같은 디폴트 메서드를 가진 두 인터페이스를 하나의 클래스에 구현하고 아무런 조치를 하지 않으면 컴파일이 되지 않음.
+* 인터페이스를 구현한 클래스에서 디폴트 메서드를 오버리이딩 하여 하나로 통합해야함.
 
 ```java
 interface A1{
@@ -374,6 +376,247 @@ public class Main {
 
 ### default 메소드의 super
 
-### 추상화
+* 상위 클래스를 상속하고 상위의 메소드를 오버라이딩하여 재정의하였을 때, 부모 메서드를 호출할 일이 생기면 super 를 통해 부모 메서드를 호출할 수 있음.
 
-### 인터페이스, 추상화 동시 사용
+```java
+interface IPrint{
+    default void print(){
+        System.out.println("인터페이스의 디폴트 메서드 입니다.");
+    }
+}
+
+class MyClass implements IPrint {
+    @Override
+    public void print() {
+        IPrint.super.print(); // 인터페이스의 super 메서드를 호출
+        System.out.println("인터페이스의 디폴트 메서드를 오버라이딩한 메서드 입니다.");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        MyClass cls = new MyClass();
+        cls.print();
+    }
+}
+```
+```
+인터페이스의 디폴트 메서드 입니다.
+인터페이스의 디폴트 메서드를 오버라이딩한 메서드 입니다.
+```
+
+### static 메소드
+
+* 일반 클래스의 static 메소드와 다를 바 없음.
+
+### 인터페이스 활용
+
+* 부모클래스의 타입으로 자식 클래스 타입을 포함 시킬 수 있다는 다형성의 법칙은 인터페이스에도 적용이 가능함.
+
+```java
+// 나쁜 예) 클래스를 바로 타입으로 사용했다.
+LinkedHashSet<Object> s = new LinkedHashSet<>();
+
+// 좋은 예) 인터페이스를 타입으로 사용했다.
+Set<Object> s = new LinkedHashSet<>();
+
+// 본래 LinkedHashSet으로 구현하였다가 사정이 생겨 TreeSet클래스로 변경해야한다고 하면, 그냥 인터페이스 타입의 변수에 재할당만 하면 된다
+Set<Object> s = new LinkedHashSet<>();
+s = new TreeSet<>();
+```
+
+* 하지만 무조건적으로 인터페이스 타입으로 선언하는 습관은 꼭 좋은 것은 아님.
+* HashSet으로 변환하는 일이 생기면 순서를 보장하지 않아 로직에 문제가 생길 수 있음.
+
+### 인터페이스 활용 예제1
+
+* 그림만 보고 구현해보기.
+
+![Alt text](image-4.png)
+
+```java
+public class InterfaceTests1_1 {
+
+	public static void main(String[] args) {
+		play(new Soccer());
+		play(new BassGuitar());
+	}
+	public static void play(IBehavior ib) {
+		ib.play();
+	}
+}
+
+public class Sport {
+
+}
+public class Guitar {
+
+}
+public class Soccer extends Sport implements IBehavior{
+
+	@Override
+	public void play() {
+		System.out.println("축구경기 ~~");
+	}
+}
+public class BassGuitar extends Guitar implements IBehavior{
+
+	@Override
+	public void play() {
+		System.out.println("베이스 기타 연주 ~~");
+	}
+}
+public interface IBehavior {
+
+	public void play();
+}
+```
+```
+축구경기 ~~
+베이스 기타 연주 ~~
+```
+
+* **인터페이스를 메소드의 매개변수 타입으로 받음으로써 인터페이스에 등록된 추상메서드를 실행하면 실제 구현 클래스의 오버라이딩한 구현 메서드가 실행**
+* 다형성을 통해 코드 중복을 없애고 유지 보수의 이점이 생김.
+
+### 추상클래스와 추상화
+
+* 구체적이지 않은 추상적인 데이터를 담고 있는 미완성 클래스임.
+* **클래스간의 공통점을 찾아내서 부모 클래스를 만드는 것.** - 추상화
+* 메소드의 선언부만 작성하고 구현부는 미완성인 채로 남겨둔 메서드.
+
+### 추상클래스 예제
+
+```java
+package MyPackage;
+
+//추상 클래스
+abstract class Pet {
+	abstract public void walk(); // 추상 메소드
+
+	abstract public void eat(); // 추상 메소드
+	
+	public int health; // 인스턴스 필드
+	
+	public Pet() {
+		health = 100;
+	}
+
+	public void run() { // 인스턴스 메소드
+		System.out.print("펫 채력 : " + this.health + "! ");
+		System.out.println("run run ~~");
+	}
+}
+
+class Dog extends Pet {
+	// 상속 받은 부모(추상) 메소드를 직접 구현
+	public void walk() {
+		System.out.println("Dog walk");
+	}
+
+	public void eat() {
+		System.out.println("Dog eat");
+	}
+}
+
+public class abstractsTest {
+	public static void main(String[] args) {
+		Dog d = new Dog();
+		d.eat(); // 부모(추상) 클래스로 부터 상속받은 추상 메소드를 직접 구현한 메소드를 실행
+		d.walk();
+		d.run(); // 부모(추상) 클래스의 인스턴스 메소드 실행
+	}
+}
+```
+```
+Dog eat
+Dog walk
+펫 채력 : 100! run run ~~
+```
+
+* 추상 메서드를 포함하고 있다는 것을 제외하고는 일발 클래스와 다른 점이 없음.
+* 단지 상속하면 선언부인 abstract 메서드를 구현한다는점의 차이, 직접 인스턴스 객체로 만들 수 없다는 차이 정도가 있음.
+
+### 추상클래스 설계 구현
+
+* 예를 들어 안드로이드 어플을 구성하는 클래스를 만든다 가정.
+	* 어플과 휴대폰의 연동에 대한 규격이 없다면??
+	* 어떻게 설계할지 막막한 경우가 발생할 수 있음.
+	* 하지만 구글이 미리 만들어둔 안드로이드 SDK에서 제공하는 추상 클래스를 상속받으면 필요한 추상 메서드만 구현하면됨.
+
+> 즉, 추상 클래스를 상속받아서 미리 정의된 공통 기능들을 구현하고, 필요한 기능들을 클래스별로 확장시킴으로써 유지보수의 성능이 좋아짐.
+
+### 인터페이스, 추상화 차이점, 동시 사용방법
+
+* 인터페이스와 추상화에 대해서 자세하게 알아보았으니 이제 둘의 차이점, 실제 코드는 어떻게 작성되는지 알아보자.
+
+![Alt text](image-5.png)
+
+* 둘의 차이점을 잘알려주는 표.
+
+#### 인터페이스 vs 추상클래스 사용처
+
+* 개념과 사용방법, 차이점도 알아보았으니 언제 사용되는지도 알아보자.
+
+#### 추상클래스 사용하는 경우
+
+1. 상속 받을 클래스들이 공통으로 가지는 메서드와 필드가 많아 중복 멤버 통합을 할 때
+2. 구현 세부 정보의 일부 기능만 지정했을 때
+3. 하위 클래스가 오버라이드하여 재정의하는 기능들을 공유하기 위한 상속 개념을 사용할 때
+4. **상속할 각 객체들의 공통점을 찾아 추상화시켜 놓은 것으로, 상속 관계를 타고 올라갔을 때 같은 부모 클래스를 상속하며 부모 클래스가 가진 기능들을 구현해야할 경우 사용함.**
+
+**중복 멤버 통합**
+
+* 같은 추상화 개념인 인터페이스와 차이점을 두기 위해, 상수 밖에 정의 못하는 인터페이스에서는 할 수 없는 기능이 추상 클래스 중복 멤버 통합임.
+
+#### 인터페이스를 사용하는 경우
+
+1. 서로 관련성이 없는 클래스들을 묶어 주고 싶을때 (형제 관계)
+2. 다중 상속(구현)을 통한 추상화 설계를 해야할때
+
+**자유로운 타입 묶음**
+
+* 인터페이스의 가장 큰 특징은 상속에 구애 받지 않은 구현이 가능하다는 것.
+
+#### 추상 클래스에 인터페이스 일부 구현 예제
+
+```java
+package MyPackage;
+
+public class AbstractsInterface {
+
+	public static void main(String[] args) {
+//		Mammalia animal = new Lion();
+		Animal animal = new Lion();
+		animal.breed();
+	}
+}
+
+interface Animal {
+    void walk();
+    void run();
+    void breed();
+}
+
+// Animal 인터페이스를 일부만 구현하는 포유류 추상 클래스
+abstract class Mammalia implements Animal {
+    public void walk() {
+    	System.out.println("walk walk ~~");
+    }
+    public void run() {
+    	System.out.println("run run ~~");
+    }
+    // breed() 메서드는 자식 클래스에서 구체적으로 구현하도록 일부로 구현하지 않음 (추상 메서드로 처리)
+}
+
+// 인터페이스 + 추상 클래스를 상속하여 사용
+class Lion extends Mammalia {
+    @Override
+    public void breed() {
+    	System.out.println("breed breed ~~");
+    }
+}
+```
+```
+breed breed ~~
+```
