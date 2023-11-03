@@ -4401,7 +4401,7 @@ balance:0
 
 * synchronized 예제로 동기화를 통해 공유 데이터를 보호하는 것을 보았음.
 * 하지만 특정 쓰레드가 객체의 락을 가진 상태로 무한 반복 또는 오랜 시간을 보낸다면 이것도 문제가 됨.
-* 예를 들어 계좌에 출금할 돈이 부족해서 한 쓰레드가 락을 보유한 채로 돈이 입글될 때 까지 오랜 시간 기다리면, 다른 쓰레드들은 락을 기다려야함.
+* 예를 들어 계좌에 출금할 돈이 부족해서 한 쓰레드가 락을 보유한 채로 돈이 입금될 때 까지 오랜 시간 기다리면, 다른 쓰레드들은 락을 기다려야함.
 * 이러한 상황을 개선하기 위해 고안된 것이 wait() 과 notify() 임.
 
 * 동기화된 임계 영역의 코드를 수행하다가 작업을 더 이상 진행할 상황이 아니면 wait() 을 호출하여 락을 반납하고 기다리게함.
@@ -4694,6 +4694,135 @@ Dishes: [burger, donut]
 * 하지만 waiting pool에 요리사 쓰레드와 손님 쓰레드가 같이 기다려, notify()호출 후 누가 통지를 받을지 알 수 없음.
 * 만약 테이블의 음식이 줄어들어서 notify() 가 호출되면 요리사 쓰레드가 통지를 받아야함.
 * 여기서 손님 쓰레드가 통지를 받으면 lock을 얻어도 여전히 자신이 원하는 음식이 없어서 다시 waiting pool에 들어가게됨.
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">람다와 스트림</summary>
+<div markdown="1">
+
+### 람다식
+
+* 람다식은 메서드를 하나의 '식' 으로 표현한 것
+* 메서드를 람다식으로 표현하면 메서드의 이름과 반환값이 없어지므로, 람다식을 '익명 함수'라고도 함.
+* 반환타입과 메서드 이름을 제거함.
+
+```java
+// 메서드를 간단한 식으로
+int max(int a, int b){
+	return a > b ? a : b;
+}
+
+//(람다식 적용 후 )
+(a, b) -> a > b ? a : b;
+
+// 반환값이 존재할 때, return문 생략 가능
+(int a, int b) -> {
+	return a > b ? a : b;
+}
+
+//(람다식 적용 후 )
+(int a, int b) -> a > b ? a : b;
+
+// 매개 변수 하나인 경우, 괄호 생략 가능(타입 없을 떄)
+(a) -> a * a    ==>>   a -> a * a
+
+(int a) -> a * a  ==>>  int a -> a * a (에러)
+```
+
+* 람다식은 익명 함수가 아니라 익명 객체.
+
+### 함수형 인터페이스
+
+* 하나의 추상메서드만 선언된 인터페이스
+
+```java
+package ch14;
+
+public class LamdaTest1_1 {
+
+	public static void main(String[] args) {
+		
+		MyFunction f =  (a, b) -> a > b ? a : b;
+
+/*
+		MyFunction f = new MyFunction() {
+
+			@Override
+			public int max(int a, int b) {
+				return a > b ? a : b;
+			}
+		};
+*/		
+		int value = f.max(3, 5);
+		System.out.println(value);
+		
+	}
+}
+
+interface MyFunction{
+	int max(int a, int b);
+}
+```
+
+* 함수형 인터페이스 타입의 참조변수로 람다식을 참조할 수 있음.
+* 함수형 인터페이스는 단 하나의 추상메서드만 가져야함.
+* 람다식을 다루기 위한 참조변수의 타입은 함수형 인터페이스로 함.(MyFunction)
+
+#### 함수형 인터페이스 매개변수, 반환타입 예제
+
+```java
+package ch14;
+
+public class LamdaTest1_2 {
+
+	static void execute(MyFunction2 f) {
+		f.run();
+	}
+	
+	static MyFunction2 getMyFunction2() {
+		MyFunction2 f = () -> System.out.println("f3.run()");
+		return f;
+	}
+	
+	
+	public static void main(String[] args) {
+		// 람다식 MyFunction의 run()구현
+		MyFunction2 f1 = () -> System.out.println("f1.run()");
+		
+		// 익명클래스로 run()구현
+		MyFunction2 f2 = new MyFunction2() {
+			
+			@Override
+			public void run() {
+				System.out.println("f2.run()");
+			}
+		};
+		
+		MyFunction2 f3 = getMyFunction2();
+		
+		f1.run();
+		f2.run();
+		f3.run();
+		
+		execute(f1);
+		execute( () -> System.out.println("run()"));
+	}
+}
+
+@FunctionalInterface
+interface MyFunction2{
+	void run();
+}
+```
+```
+f1.run()
+f2.run()
+f3.run()
+f1.run()
+run()
+```
 
 </div>
 </details>
