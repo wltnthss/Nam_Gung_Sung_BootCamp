@@ -4310,6 +4310,390 @@ static boolean interrupted()	// false 초기화
 
 ### 쓰레드의 동기화(synchronization)
 
+* 멀티 쓰레드는 여러 쓰레드가 같은 자원을 공유하기 때문에 작업에 영향을 미칠 수가 있음.
+* 동기화 : 한 쓰레드가 진행중인 작업을 **다른 쓰레드가 간섭하지 못하게 막는 것.**
+* 동기화하려면 간섭받지 않아야 하는 문장들을 임계 영역으로 설정해야함.
+  * 임계 영역 : **다른 쓰레드가 간섭하지 못하게 여러 문장들을 하나로 묶는 것**
+* 임계영역은 락을 얻은 단 하나의 쓰레드만 출입가능(객체 1개에 락 1개)
+
+#### synchronized 를 이용한 동기화
+
+```java
+// 메서드 전체를 임계 영역으로 지정
+public synchronized void calcSum(){
+	...
+}
+
+// 특정한 영역을 임계 영역으로 지정
+synchronized(객체의 참조변수){
+	...
+}
+```
+
+* 임계 영역은 최소화해야함. 1번에 1개의 쓰레드만 임계 영역에 들어갈 수 있기 때문임.
+* 
+#### synchronized 를 이용한 동기화 예제
+
+```java
+package ch13;
+
+public class Ex13_12 {
+
+	public static void main(String[] args) {
+		Runnable r = new RunnableEx12();
+		Thread t1 = new Thread(r);
+		Thread t2 = new Thread(r);
+		t1.start();
+		t2.start();
+	}
+}
+
+class Account{
+	
+	private int balance = 1000; // 직접 접근을 막기 위해 private 으로 해야 동기화가 의미가 있음.
+	
+	public int getBalance() {
+		return balance;
+	}
+	public synchronized void withdraw(int money) {
+		if(balance >= money) {
+			try {
+				Thread.sleep(1000);
+			}catch(InterruptedException e) {
+				
+			}
+			balance -= money;
+		}
+	}
+}
+
+class RunnableEx12 implements Runnable{
+
+	Account acc = new Account();
+	
+	@Override
+	public void run() {
+		while(acc.getBalance() > 0) {
+			int money = (int)(Math.random() * 3 +1) * 100;
+			acc.withdraw(money);
+			System.out.println("balance:"+acc.getBalance());
+		}
+	}
+	
+}
+```
+```
+balance:700
+balance:500
+balance:200
+balance:100
+balance:0
+balance:0
+```
+
+* synchronized 를 붙이지 않으면 잔고가 음수가 될 수 있음. 왜 일까?
+  * 쓰레드 A,B가 동기화되지않아서 200원에서 두 번의 랜덤함수를 통해 money 를 빼기때문에 음수가 될 수 있음
+  * 하지만 synchronized 를 통해 자물쇠를 걸어 임계영역으로 설정한다면 A가 자물쇠를 건동안 한 번의 쓰레드 작업을 거치고나서 B가 작업을 수행함.
+  * 그러므로 음수의 결과값은 나오지 않음.
+  * 즉, 동시에 두 가지 if문을 타지 않도록 synchronized 로 동기화해줬기에 이런 결과가 나온 것임.
+
+### wait() 과 notify()
+
+* synchronized 예제로 동기화를 통해 공유 데이터를 보호하는 것을 보았음.
+* 하지만 특정 쓰레드가 객체의 락을 가진 상태로 무한 반복 또는 오랜 시간을 보낸다면 이것도 문제가 됨.
+* 예를 들어 계좌에 출금할 돈이 부족해서 한 쓰레드가 락을 보유한 채로 돈이 입글될 때 까지 오랜 시간 기다리면, 다른 쓰레드들은 락을 기다려야함.
+* 이러한 상황을 개선하기 위해 고안된 것이 wait() 과 notify() 임.
+
+* 동기화된 임계 영역의 코드를 수행하다가 작업을 더 이상 진행할 상황이 아니면 wait() 을 호출하여 락을 반납하고 기다리게함.
+* 그러면 다른 쓰레드가 락을 얻어 해당 객체에 대한 작업을 수행할 수 있게 됨.
+* 후에 작업을 진행할 수 있는 상황이 되면 notify()를 호출하여 작업을 중단했떤 쓰레드가 다시 락을 얻어 작업을 진행하게됨.
+
+> wait() 호출 -> 실행 중이던 쓰레드 객체의 대기실에서 통지를 기다림 -> notify() 호출 시 대기실(waiting pool)에 있던 임의의 쓰레드에게 통보를 보냄
+>
+> notifyAll() -> 대기실(waiting pool) 에 있는 모든 쓰레드에게 통보를 보냄.
+
+#### wait() 과 notify() 예제
+
+```java
+package ch13;
+
+import java.util.ArrayList;
+
+public class Ex13_14 {
+
+	public static void main(String[] args) throws InterruptedException {
+		
+		Table table = new Table();
+		
+		new Thread(new Cook(table), "COOK").start();
+		new Thread(new Customer(table, "donut"), "CUST1").start();
+		new Thread(new Customer(table, "burger"), "CUST2").start();
+		
+		Thread.sleep(5000);
+		System.exit(0);
+	}
+}
+
+class Table{
+	String[] dishNames = { "donut", "donut", "burger" };
+	final int MAX_FOOD = 6;
+	private ArrayList<String> dishes = new ArrayList<String>();
+	
+	public synchronized void add(String dish) {
+		if(dishes.size() >= MAX_FOOD) {
+			return;
+		}
+		dishes.add(dish);
+		System.out.println("Dishes: " + dishes.toString());
+	}
+	public boolean remove(String dishName) {
+		synchronized (this) {
+			while(dishes.size() == 0) {
+				String name = Thread.currentThread().getName();
+				System.out.println(name+" is waiting.");
+				try {
+					Thread.sleep(500);
+				}catch (InterruptedException e) {
+				}
+			}
+			for (int i = 0; i < dishes.size(); i++) {
+				if(dishName.equals(dishes.get(i))) {
+					dishes.remove(i);
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	public int dishNum() {
+		return dishNames.length;
+	}
+}
+
+class Customer implements Runnable{
+	private Table table;
+	private String food;
+	
+	public Customer(Table table, String food) {
+		super();
+		this.table = table;
+		this.food = food;
+	}
+
+	@Override
+	public void run() {
+		while(true) {
+			try {
+				Thread.sleep(10);
+			}catch (InterruptedException e) {
+			}
+			String name = Thread.currentThread().getName();
+			
+			if(eatFood()) {
+				System.out.println(name + " ate a " + food);
+			}else {
+				System.out.println(name + " failed to eat. :(");
+			}
+		}
+	}
+	
+	boolean eatFood() {
+		return table.remove(food);
+	}
+}
+
+class Cook implements Runnable {
+	private Table table;
+	
+	public Cook(Table table) {
+		this.table = table;
+	}
+	
+	public void run() {
+		while(true) {
+			int idx = (int)(Math.random() * table.dishNum());
+			table.add(table.dishNames[idx]);
+			try {
+				Thread.sleep(100);
+			}catch (InterruptedException e) {
+				// TODO: handle exception
+			}
+		}
+	}
+}
+```
+
+```
+Dishes: [donut]
+CUST2 is waiting.
+CUST1 ate a donut
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+```
+
+* 이해하기 어려운 예제로 여러번 복습해서 보자.
+* 여러 쓰레드가 공유하는 객체인 테이블의 add() 와 remove() 를 동기화함.
+* 손님 쓰레드가 원하는 음식이 테이블에 없으면 failed to eat 을 출력하고 테이블에 음식이 없으면 계속 기다림..
+* 이유는 손님 쓰레드가 테이블 객체의 lock 을 쥐고 기다리기 떄문임.
+* 이럴 때 사용하는 것이 바로 wait() & notify() 임.
+* 손님 쓰레드가 lock을 쥐고 기다리는게 아니라, wait()으로 lock을 풀고 기다리다가 음식이 추가되면 notify()로 통보를 받고 다시 lock을 얻어서 진행함.
+
+#### wait() 과 notify() 예제2
+
+```java
+package ch13;
+
+import java.util.ArrayList;
+
+public class Ex13_15 {
+	public static void main(String[] args) throws InterruptedException {
+		
+		Table2 table = new Table2();
+		
+		new Thread(new Cook2(table), "COOK").start();
+		new Thread(new Customer2(table, "donut"), "CUST1").start();
+		new Thread(new Customer2(table, "burger"), "CUST2").start();
+		
+		Thread.sleep(2000);
+		System.exit(0);
+	}
+}
+
+class Table2{
+	String[] dishNames = { "donut", "donut", "burger" };
+	final int MAX_FOOD = 6;
+	private ArrayList<String> dishes = new ArrayList<String>();
+	
+	public synchronized void add(String dish) {
+		if(dishes.size() >= MAX_FOOD) {
+			String name = Thread.currentThread().getName();
+			System.out.println(name+" is waiting.");
+			try {
+				wait();
+				Thread.sleep(500);
+			} catch (Exception e) {
+			}
+		}
+		dishes.add(dish);
+		notify();
+		System.out.println("Dishes: " + dishes.toString());
+	}
+	public void remove(String dishName) {
+		synchronized (this) {
+			String name = Thread.currentThread().getName();
+			
+			while(dishes.size() == 0) {
+				System.out.println(name+" is waiting.");
+				try {
+					wait();
+					Thread.sleep(500);
+				}catch (InterruptedException e) {
+				}
+			}
+			while(true) {
+				for (int i = 0; i < dishes.size(); i++) {
+					if(dishName.equals(dishes.get(i))) {
+						dishes.remove(i);
+						notify();
+						return;
+					}
+				}	
+				
+				try {
+					System.out.println(name+" is waiting.");
+					wait();
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
+			}
+			
+		}
+	}
+	
+	public int dishNum() {
+		return dishNames.length;
+	}
+}
+
+class Cook2 implements Runnable {
+	private Table2 table;
+	
+	public Cook2(Table2 table) {
+		this.table = table;
+	}
+	
+	public void run() {
+		while(true) {
+			int idx = (int)(Math.random() * table.dishNum());
+			table.add(table.dishNames[idx]);
+			try {
+				Thread.sleep(10);
+			}catch (InterruptedException e) {
+			}
+		}
+	}
+}
+
+class Customer2 implements Runnable{
+	private Table2 table;
+	private String food;
+	
+	public Customer2(Table2 table, String food) {
+		super();
+		this.table = table;
+		this.food = food;
+	}
+
+	@Override
+	public void run() {
+		while(true) {
+			try {
+				Thread.sleep(10);
+			}catch (InterruptedException e) {
+			}
+			String name = Thread.currentThread().getName();
+			
+			table.remove(food);
+			System.out.println(name + " ate a " + food);
+		}
+	}
+}
+```
+```
+Dishes: [donut]
+CUST2 is waiting.
+Dishes: [burger]
+CUST1 ate a donut
+CUST2 ate a burger
+Dishes: [donut]
+CUST1 ate a donut
+CUST1 is waiting.
+Dishes: [donut]
+CUST1 ate a donut
+Dishes: [donut]
+CUST2 is waiting.
+Dishes: [donut, burger]
+Dishes: [donut, burger]
+CUST1 ate a donut
+CUST2 ate a burger
+CUST1 is waiting.
+Dishes: [burger, donut]
+```
+
+* 이전 예제에서 wait() 과 notify()를 추가함.
+* 테이블에 음식이 없을 때뿐만 아니라, 원하는 음식이 없을 때도 손님이 기다리도록 코드를 수정함.
+* 하지만 waiting pool에 요리사 쓰레드와 손님 쓰레드가 같이 기다려, notify()호출 후 누가 통지를 받을지 알 수 없음.
+* 만약 테이블의 음식이 줄어들어서 notify() 가 호출되면 요리사 쓰레드가 통지를 받아야함.
+* 여기서 손님 쓰레드가 통지를 받으면 lock을 얻어도 여전히 자신이 원하는 음식이 없어서 다시 waiting pool에 들어가게됨.
 
 </div>
 </details>
