@@ -4824,5 +4824,109 @@ f1.run()
 run()
 ```
 
+### java.util.function 패키지
+
+* 대부분의 메서드 타입은 매개변수가 없거나 한 개, 두 개, 반환값은 없거나 한 개 형식으로 되어있음.
+* 이를 위해서 매번 새로운 함수형 인터페이스를 정의하지 말고 가능하면 정의해놓은 패키지의 인터페이스를 활용하자는 뜻으로 사용함.
+
+```java
+
+//패키지
+java.lang.Runnable
+// void run()	-> 	매개변수도 없고, 반환값도 없음
+
+//패키지
+Supplier<T>
+// T get()	-> 	매개변수는 없고, 반환값만 있음
+
+//패키지
+Consumer<T>
+// void accept(T t)	-> 매개변수만 있고, 반환값이 없음
+
+//패키지
+Function<T,R>
+// R apply(T t)	-> 일반적인 함수로, 하나의 매개변수를 받아서 결과를 반환
+
+//패키지
+Predicate<T>
+//	boolean test(T t)	-> 조건식을 표현하는데 사용되며 매개변수는 하나이고, 반환 타입은 boolean
+```
+
+* 매개변수도 두 개일 때는 이름앞에 접두사 'Bi' 붙임. BiSupplier 는 매개 변수는 없으므로 존재하지 않음.
+  * ex) BiConsumer, BiPredicate, BiFunction
+* 만일 두 개 이상의 매개변수를 갖는 함수형 인터페이스가 필요하다면 직접 만들어서 사용해야함.
+  
+**UnaryOperator, BinarayOperator**
+
+* UnaryOperator<T> 는 Function의 자손이며 매개변수와 결과의 타입이 같음.
+* BinaryOpertaor<T> 는 BiFuntion의 자손, BiFunction과 달리 매개변수의 결과와 타입이 같음.
+
+#### java.util.function 패키지 예제
+
+```java
+package ch14;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public class Ex14_2 {
+	public static void main(String[] args) {
+		// Supplier 매개변수가 없고 반환값만 있음
+		Supplier<Integer> s = () -> (int)(Math.random() * 100) + 1;
+		// Consumer 매개변수만 있고 반환값은 없음
+		Consumer<Integer> c = i -> System.out.print(i+", ");
+		// Predicate 매개변수는 하나 반환 타입은 boolean
+		Predicate<Integer> p = i -> i % 2 == 0;
+		// Function 매개변수를 받아 결과 반환
+		Function<Integer, Integer> f = i -> i/10*10;
+		
+		List<Integer> list = new ArrayList<Integer>();
+		
+		makeRandomList(s, list);
+		System.out.println(list);
+		printEvenNum(p, c, list);
+		List<Integer> newList = doSomething(f, list);
+		System.out.println(newList);
+		
+		
+	}
+	static<T> List<T> doSomething(Function<T, T> f, List<T> list){
+		List<T> newList = new ArrayList<T>(list.size());
+		
+		for(T i : list) {
+			newList.add(f.apply(i));
+		}
+		return newList;
+	}
+	
+	static <T> void makeRandomList(Supplier<T> s, List<T> list) {
+		for (int i = 0; i < 10; i++) {
+			list.add(s.get());
+		}
+	}
+	
+	static <T> void printEvenNum(Predicate<T> p, Consumer<T> c, List<T> list) {
+		System.out.print("[");
+		for(T i : list) {
+			if(p.test(i)) {
+				c.accept(i);
+			}
+		}
+		System.out.println("]");
+	}
+}
+```
+```
+[46, 35, 51, 39, 34, 78, 85, 44, 8, 16]
+[46, 34, 78, 44, 8, 16, ]
+[40, 30, 50, 30, 30, 70, 80, 40, 0, 10]
+```
+
+* Supplier(get), Consumer(accept), Predicate(test), Function(apply) 4개의 사용방법을 잘알아두자.
+
 </div>
 </details>
