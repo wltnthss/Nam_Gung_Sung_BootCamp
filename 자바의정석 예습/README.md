@@ -4401,7 +4401,7 @@ balance:0
 
 * synchronized 예제로 동기화를 통해 공유 데이터를 보호하는 것을 보았음.
 * 하지만 특정 쓰레드가 객체의 락을 가진 상태로 무한 반복 또는 오랜 시간을 보낸다면 이것도 문제가 됨.
-* 예를 들어 계좌에 출금할 돈이 부족해서 한 쓰레드가 락을 보유한 채로 돈이 입글될 때 까지 오랜 시간 기다리면, 다른 쓰레드들은 락을 기다려야함.
+* 예를 들어 계좌에 출금할 돈이 부족해서 한 쓰레드가 락을 보유한 채로 돈이 입금될 때 까지 오랜 시간 기다리면, 다른 쓰레드들은 락을 기다려야함.
 * 이러한 상황을 개선하기 위해 고안된 것이 wait() 과 notify() 임.
 
 * 동기화된 임계 영역의 코드를 수행하다가 작업을 더 이상 진행할 상황이 아니면 wait() 을 호출하여 락을 반납하고 기다리게함.
@@ -4694,6 +4694,239 @@ Dishes: [burger, donut]
 * 하지만 waiting pool에 요리사 쓰레드와 손님 쓰레드가 같이 기다려, notify()호출 후 누가 통지를 받을지 알 수 없음.
 * 만약 테이블의 음식이 줄어들어서 notify() 가 호출되면 요리사 쓰레드가 통지를 받아야함.
 * 여기서 손님 쓰레드가 통지를 받으면 lock을 얻어도 여전히 자신이 원하는 음식이 없어서 다시 waiting pool에 들어가게됨.
+
+</div>
+</details>
+
+<details>
+<summary style="font-size:20px">람다와 스트림</summary>
+<div markdown="1">
+
+### 람다식
+
+* 람다식은 메서드를 하나의 '식' 으로 표현한 것
+* 메서드를 람다식으로 표현하면 메서드의 이름과 반환값이 없어지므로, 람다식을 '익명 함수'라고도 함.
+* 반환타입과 메서드 이름을 제거함.
+
+```java
+// 메서드를 간단한 식으로
+int max(int a, int b){
+	return a > b ? a : b;
+}
+
+//(람다식 적용 후 )
+(a, b) -> a > b ? a : b;
+
+// 반환값이 존재할 때, return문 생략 가능
+(int a, int b) -> {
+	return a > b ? a : b;
+}
+
+//(람다식 적용 후 )
+(int a, int b) -> a > b ? a : b;
+
+// 매개 변수 하나인 경우, 괄호 생략 가능(타입 없을 떄)
+(a) -> a * a    ==>>   a -> a * a
+
+(int a) -> a * a  ==>>  int a -> a * a (에러)
+```
+
+* 람다식은 익명 함수가 아니라 익명 객체.
+
+### 함수형 인터페이스
+
+* 하나의 추상메서드만 선언된 인터페이스
+
+```java
+package ch14;
+
+public class LamdaTest1_1 {
+
+	public static void main(String[] args) {
+		
+		MyFunction f =  (a, b) -> a > b ? a : b;
+
+/*
+		MyFunction f = new MyFunction() {
+
+			@Override
+			public int max(int a, int b) {
+				return a > b ? a : b;
+			}
+		};
+*/		
+		int value = f.max(3, 5);
+		System.out.println(value);
+		
+	}
+}
+
+interface MyFunction{
+	int max(int a, int b);
+}
+```
+
+* 함수형 인터페이스 타입의 참조변수로 람다식을 참조할 수 있음.
+* 함수형 인터페이스는 단 하나의 추상메서드만 가져야함.
+* 람다식을 다루기 위한 참조변수의 타입은 함수형 인터페이스로 함.(MyFunction)
+
+#### 함수형 인터페이스 매개변수, 반환타입 예제
+
+```java
+package ch14;
+
+public class LamdaTest1_2 {
+
+	static void execute(MyFunction2 f) {
+		f.run();
+	}
+	
+	static MyFunction2 getMyFunction2() {
+		MyFunction2 f = () -> System.out.println("f3.run()");
+		return f;
+	}
+	
+	
+	public static void main(String[] args) {
+		// 람다식 MyFunction의 run()구현
+		MyFunction2 f1 = () -> System.out.println("f1.run()");
+		
+		// 익명클래스로 run()구현
+		MyFunction2 f2 = new MyFunction2() {
+			
+			@Override
+			public void run() {
+				System.out.println("f2.run()");
+			}
+		};
+		
+		MyFunction2 f3 = getMyFunction2();
+		
+		f1.run();
+		f2.run();
+		f3.run();
+		
+		execute(f1);
+		execute( () -> System.out.println("run()"));
+	}
+}
+
+@FunctionalInterface
+interface MyFunction2{
+	void run();
+}
+```
+```
+f1.run()
+f2.run()
+f3.run()
+f1.run()
+run()
+```
+
+### java.util.function 패키지
+
+* 대부분의 메서드 타입은 매개변수가 없거나 한 개, 두 개, 반환값은 없거나 한 개 형식으로 되어있음.
+* 이를 위해서 매번 새로운 함수형 인터페이스를 정의하지 말고 가능하면 정의해놓은 패키지의 인터페이스를 활용하자는 뜻으로 사용함.
+
+```java
+
+//패키지
+java.lang.Runnable
+// void run()	-> 	매개변수도 없고, 반환값도 없음
+
+//패키지
+Supplier<T>
+// T get()	-> 	매개변수는 없고, 반환값만 있음
+
+//패키지
+Consumer<T>
+// void accept(T t)	-> 매개변수만 있고, 반환값이 없음
+
+//패키지
+Function<T,R>
+// R apply(T t)	-> 일반적인 함수로, 하나의 매개변수를 받아서 결과를 반환
+
+//패키지
+Predicate<T>
+//	boolean test(T t)	-> 조건식을 표현하는데 사용되며 매개변수는 하나이고, 반환 타입은 boolean
+```
+
+* 매개변수도 두 개일 때는 이름앞에 접두사 'Bi' 붙임. BiSupplier 는 매개 변수는 없으므로 존재하지 않음.
+  * ex) BiConsumer, BiPredicate, BiFunction
+* 만일 두 개 이상의 매개변수를 갖는 함수형 인터페이스가 필요하다면 직접 만들어서 사용해야함.
+  
+**UnaryOperator, BinarayOperator**
+
+* UnaryOperator<T> 는 Function의 자손이며 매개변수와 결과의 타입이 같음.
+* BinaryOpertaor<T> 는 BiFuntion의 자손, BiFunction과 달리 매개변수의 결과와 타입이 같음.
+
+#### java.util.function 패키지 예제
+
+```java
+package ch14;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public class Ex14_2 {
+	public static void main(String[] args) {
+		// Supplier 매개변수가 없고 반환값만 있음
+		Supplier<Integer> s = () -> (int)(Math.random() * 100) + 1;
+		// Consumer 매개변수만 있고 반환값은 없음
+		Consumer<Integer> c = i -> System.out.print(i+", ");
+		// Predicate 매개변수는 하나 반환 타입은 boolean
+		Predicate<Integer> p = i -> i % 2 == 0;
+		// Function 매개변수를 받아 결과 반환
+		Function<Integer, Integer> f = i -> i/10*10;
+		
+		List<Integer> list = new ArrayList<Integer>();
+		
+		makeRandomList(s, list);
+		System.out.println(list);
+		printEvenNum(p, c, list);
+		List<Integer> newList = doSomething(f, list);
+		System.out.println(newList);
+		
+		
+	}
+	static<T> List<T> doSomething(Function<T, T> f, List<T> list){
+		List<T> newList = new ArrayList<T>(list.size());
+		
+		for(T i : list) {
+			newList.add(f.apply(i));
+		}
+		return newList;
+	}
+	
+	static <T> void makeRandomList(Supplier<T> s, List<T> list) {
+		for (int i = 0; i < 10; i++) {
+			list.add(s.get());
+		}
+	}
+	
+	static <T> void printEvenNum(Predicate<T> p, Consumer<T> c, List<T> list) {
+		System.out.print("[");
+		for(T i : list) {
+			if(p.test(i)) {
+				c.accept(i);
+			}
+		}
+		System.out.println("]");
+	}
+}
+```
+```
+[46, 35, 51, 39, 34, 78, 85, 44, 8, 16]
+[46, 34, 78, 44, 8, 16, ]
+[40, 30, 50, 30, 30, 70, 80, 40, 0, 10]
+```
+
+* Supplier(get), Consumer(accept), Predicate(test), Function(apply) 4개의 사용방법을 잘알아두자.
 
 </div>
 </details>
