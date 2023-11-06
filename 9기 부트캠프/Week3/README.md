@@ -241,11 +241,288 @@ public class AbstractInterfaceTestEx1_1 {
 ![Alt text](image-3.png)
 ![Alt text](image-4.png)
 
+```java
+// Player
+package MyPackage;
+
+public class Player {
+	
+	private PlayerLevel level;
+	
+	public Player() {
+		level = new BeginnerLevel();
+		level.showLevelMessage();
+	}
+	
+	public PlayerLevel getLevel() {
+		return level;
+	}
+	
+	public void upgradeLevel(PlayerLevel level){
+		this.level = level;
+		level.showLevelMessage();
+	}
+
+	public void play(int counter) {
+		level.go(counter);
+	}
+}
+
+// PlayerLevel
+package MyPackage;
+
+abstract public class PlayerLevel {
+	
+	public abstract void run();
+	public abstract void jump();
+	public abstract void turn();
+	public abstract void showLevelMessage();
+	
+	public void go(int count) {
+		//count횟수만큼 jump하고 turn
+		run();
+		for (int i = 0; i < count; i++) {
+			jump();
+		}
+		turn();
+	}
+	
+}
+
+// Beginner
+package MyPackage;
+
+public class BeginnerLevel extends PlayerLevel{
+
+	@Override
+	public void run() {
+		System.out.println("천천히 달립니다.");
+	}
+
+	@Override
+	public void jump() {
+		System.out.println("jump 못하지롱");
+	}
+
+	@Override
+	public void turn() {
+		System.out.println("turn 못하지롱");
+	}
+
+	@Override
+	public void showLevelMessage() {
+		System.out.println("****** 초급자 레벨입니다. ******");
+	}
+}
+
+// Advanced
+package MyPackage;
+
+public class AdvanceLevel extends PlayerLevel{
+
+	@Override
+	public void run() {
+		System.out.println("빨리 달립니다.");
+	}
+
+	@Override
+	public void jump() {
+		System.out.println("높이 jump 합니다.");
+	}
+
+	@Override
+	public void turn() {
+		System.out.println("turn 못하지롱.");
+	}
+
+	@Override
+	public void showLevelMessage() {
+		System.out.println("****** 중급자 레벨입니다. ******");
+	}
+}
+
+// Super
+package MyPackage;
+
+public class SuperLevel extends PlayerLevel{
+
+	@Override
+	public void run() {
+		System.out.println("엄청 빠르게 달립니다.");
+	}
+
+	@Override
+	public void jump() {
+		System.out.println("아주 높이 jump 합니다.");
+	}
+
+	@Override
+	public void turn() {
+		System.out.println("turn 합니다.");
+	}
+
+	@Override
+	public void showLevelMessage() {
+		System.out.println("****** 고급자 레벨입니다. ******");
+	}
+}
+
+// Main
+package MyPackage;
+
+public class PlayTests {
+
+	public static void main(String[] args) {
+		
+		Player player = new Player();
+		player.play(1);
+		
+		AdvanceLevel advanceLevel = new AdvanceLevel();
+		player.upgradeLevel(advanceLevel);
+		player.play(2);
+		
+		SuperLevel superLevel = new SuperLevel();
+		player.upgradeLevel(superLevel);
+		player.play(3);
+	}
+}
+```
+```
+****** 초급자 레벨입니다. ******
+천천히 달립니다.
+jump 못하지롱
+turn 못하지롱
+****** 중급자 레벨입니다. ******
+빨리 달립니다.
+높이 jump 합니다.
+높이 jump 합니다.
+turn 못하지롱.
+****** 고급자 레벨입니다. ******
+엄청 빠르게 달립니다.
+아주 높이 jump 합니다.
+아주 높이 jump 합니다.
+아주 높이 jump 합니다.
+turn 합니다.
+```
+
 * 위 그림들만 보고 구현해보기.
 * 결과는 깃허브 https://github.com/easyspubjava/FastCampus/tree/master/Chapter3/src/ch16 참고.
 
+* 헷갈렸던점 : Player 구현.
+* 기본생성자에서 시작으로 Beginner 생성자를 호출하는게 떠오르지않아 30분정도 헤맸음.
+* upgradeLevel 함수에서 this.level = level; main을 보고 유추하지않으면 떠오르지 않았음.
+* 다른 예제를 더 풀어보면서 객체지향설계에 익숙해져야되겠다. (바카라 카드게임, 패캠 다른 예제)
+
+## 객체지향설계 추가예제
+
+![Alt text](image-5.png)
+![Alt text](image-6.png)
+
+* 위 그림들만 보고 구현해보기.
+
+```java
+package MyPackage;
+
+public interface Scheduler {
+
+	public void getNextCall();
+	public void sendCallToAgent();
+}
 
 
-## 객체배열 한번 더 풀기(컬렉션 프레임워크 x)
+package MyPackage;
+
+public class PriorityAllocation  implements Scheduler{
+
+	@Override
+	public void getNextCall() {
+		System.out.println("우선 순위가 높은 고객우선 대기열에서 가져옵니다.");
+	}
+
+	@Override
+	public void sendCallToAgent() {
+		System.out.println("다음 순서의 상담원에게 배분합니다.");
+	}
+
+}
+
+package MyPackage;
+
+public class RoundRobin implements Scheduler{
+
+	@Override
+	public void getNextCall() {
+		System.out.println("상담 전화를 순서대로 대기열에서 가져옵니다.");
+	}
+
+	@Override
+	public void sendCallToAgent() {
+		System.out.println("다음 순서의 상담원에게 배분합니다.");
+	}
+
+}
+package MyPackage;
+
+public class LeastJob implements Scheduler{
+
+	@Override
+	public void getNextCall() {
+		System.out.println("대기가 적은 상담원 우선 대기열에서 가져옵니다.");
+	}
+
+	@Override
+	public void sendCallToAgent() {
+		System.out.println("다음 순서의 상담원에게 배분합니다.");
+	}
+
+}
+
+package MyPackage;
+
+import java.io.IOException;
+
+public class SchedulerTest {
+
+	public static void main(String[] args) throws IOException {
+
+		System.out.println("전화 상담원 할당 방식을 선택하세요");
+		System.out.println("R : 한명씩 차례대로");
+		System.out.println("L : 대기가 적은 상담원 우선");
+		System.out.println("P : 우선순위가 높은 고객우선 숙련도 높은 상담원");
+		
+		int ch = System.in.read();
+		Scheduler scheduler = null;
+		
+		if ( ch == 'R' || ch =='r') {
+			scheduler = new RoundRobin();
+		}
+		else if ( ch == 'L' || ch =='l') {
+			scheduler = new LeastJob();
+		}
+		else if ( ch == 'P' || ch =='p') {
+			scheduler = new PriorityAllocation();
+		}
+		else {
+			System.out.println("지원되지 않는 기능입니다.");
+			return;
+		}
+		
+		scheduler.getNextCall();
+		scheduler.sendCallToAgent();
+	}
+
+}
+```
+```
+전화 상담원 할당 방식을 선택하세요
+R : 한명씩 차례대로
+L : 대기가 적은 상담원 우선
+P : 우선순위가 높은 고객우선 숙련도 높은 상담원
+P
+우선 순위가 높은 고객우선 대기열에서 가져옵니다.
+다음 순서의 상담원에게 배분합니다.
+```
+
+* 간단한 인터페이스를 활용한 예제.
 
 ## 다섯째 주 이내에 카드게임에 이은 바카라 게임 자바로만 구현해보기(설계까지)
