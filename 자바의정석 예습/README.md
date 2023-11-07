@@ -5040,5 +5040,284 @@ Function<Integer, int[]> f = x -> new int[x];
 Function<Integer, int[]> f2 = int[]::new;
 ```
 
+* 많은 수의 데이터를 다룰 때 스트림을 사용함.
+  * List를 정렬할 때는 Collections.sort()를, 배열을 정렬할 때는 Arrays.sort()를 표준화 없이 다뤄짐.
+  * 이를 해결하기 위한 것이 스트림.
+* 스트림은 데이터 소스를 추상화하고, 데이터를 다루는데 자주 사용되는 메서드를 정의
+
+```java
+public class StreamsTest {
+
+	public static void main(String[] args) {
+		 String[] str = { "aaa", "bbb", "ccc" };
+		 List<String> strList = Arrays.asList(str);
+		 
+		 System.out.println(strList);
+		 
+		 Stream<String> stream1 = strList.stream();
+		 Stream<String> stream2 = Arrays.stream(str);
+		 
+		 stream1.sorted().forEach(System.out::println);
+		 stream2.sorted().forEach(System.out::println);
+
+		// 정렬된 결과를 새로운 List에 담아서 반환함.
+		 stream2 = Arrays.stream(str);
+		 List<String> sortedList = stream2.sorted().collect(Collectors.toList());
+		 System.out.println(sortedList);
+
+		// 스트림은 1회용이기에 컬렉션 요소를 모두 읽으면 다시 생성해줘야함.
+		 stream1 = strList.stream();
+		 long numOfStr = stream1.count();
+		 System.out.println(numOfStr);
+	}
+}
+```
+```
+[aaa, bbb, ccc]
+aaa
+bbb
+ccc
+aaa
+bbb
+ccc
+[aaa, bbb, ccc]
+3
+```
+
+* 스트림은 데이터 소스로부터 데이터를 읽기만할 뿐, 데이터 소스를 변경하지는 않음.
+* 필요하다면, 정렬된 결과를 컬렉션이나 배열에 담아서 반환할 수 있음.
+* 스트림은 작업을 내부 반복으로 처리함.
+
+#### 스트림 만들기 
+
+**컬렉션**
+
+* 스트림으로 작업하려면 배열, 컬렉션, 임의의 수 등. 스트림을 우선적으로 생성해야함.
+* 컬렉션 최고 조상인 Collection에 stream()이 정의되어 있음.
+  * 자손인 List와 Set을 구현한 컬렉션 클래스들은 모두 이 메서드로 스트림을 생성할 수 있음.
+
+```java
+Stream<E> stream();	// Collection 인터페이스 메서드
+
+// list1을 소스로 하는 스트림 instStream1 생성
+List<Integer> list1 = Arrays.asList(1,2,3,4,5);
+Stream<Integer> intStream1 = list1.stream();
+
+// list1을 사용하려면 최종연산을 수행해줘야함.
+intStream1.forEach(System.out::println);
+intStream1.forEach(System.out::println);	// 에러 발생
+```
+```
+1
+2
+3
+4
+5
+```
+
+* 한번 생성한 스트림은 두 번 호출할 수 없음.
+
+**배열**
+
+```java
+Stream<String> strStream1 = Stream.of("a", "b", "c");
+Stream<String> strStream2 = Arrays.stream(new String[] {"a", "b", "c"});
+IntStream intStream2 = Arrays.stream(new int[] {1,2,3}); 
+Stream<int[]> intStream3 = Stream.of(new int[] {1,2,3});
+```
+
+* 문자열 스트림과 int, long, double 등 기본형 배열을 소스로 하는 스트림을 생성하는 메서드도 존재함.
+
+**임의의 수**
+
+```java
+// 난수로 이루어진 스트림 반환 - 무한 스트림
+// IntStream ints(), LongStream longs(), DoubleStream doubles()
+
+// 무한스트림
+IntStream intStream4 = new Random().ints();
+// 유한스트림
+intStream4.limit(5).forEach(System.out::println);
+```
+```
+1745314093
+-1497720991
+466713899
+-1325267381
+-1215782904
+```
+
+* 난수를 생성하는 Random 클래스들에는 해당 타입의 난수들로 이루어진 스트림을 반환함.
+* 이 메서드들은 크기가 정해지지 않은 무한스트림이므로 **limit()** 를 같이 사용해서 유한 스트림으로 만들어줘야함.
+
+**특정 범위의 정수**
+
+```java
+IntStream intStream5 = IntStream.range(1, 5);
+intStream5.forEach(System.out::print);
+```
+```
+1234
+```
+
+* range() 와 같이 지정된 범위의 연속된 정수를 스트림으로 생성해서 반환할 수 있음.
+* rangeClosed() 는 end의 범위까지 포함해서 반환함.
+
+**람다식 iterate(), generate()**
+
+```java
+Stream<Integer> evenStream = Stream.iterate(0, n->n+2);
+evenStream.forEach(System.out::print);	// 0, 2, 4, 6 ... 2의 배수로 무한 증가
+```
+
+* Stream 클래스의 iterate()와 generate()는 람다식을 매개변수로 받아 무한 스트림을 생성함.
+* generate() 도 무한 스트림을 생성해서 반환하지만, 이전 결과를 이용해서 다음 요소를 계산하지는 않음.
+* interate() 와 generate() 는 기본형 스트림 타입의 참조변수로 다룰 수는 없음.
+
+**파일과 빈 스트림**
+
+```java
+Stream<Path> Files.list(Path dir)
+Stream<String> Files.lines(Path path)
+
+// 빈 스트림 : 요소가 없는 비어있는 스트림 생성
+Stream emptyStream = Stream.emptry();	// empty는 빈 스트림을 생성해서 반환함.
+long count = emptyStream.count()		// count값 0
+```
+
+* list()는 지정한 디렉토리에 있는 파일의 목록을 소스로 하는 스트림을 생성해서 반환함.
+
+### 스트림 연산
+
+* 스트림이 제공하는 다양한 연산을 이용하면 복잡한 작업들을 간단히 처리할 수 있음.
+* 스트림이 제공하는 연산은 중간 연산, 최종 연산으로 분류 할 수 있음.
+* 중간 연산은 연산결과를 스트림으로 반환하여 중간 연산을 연속해서 연결할 수 있음.
+* 반면에 최종 연산은 스트림의 요소를 소모하며 연산을 수행하므로 한번만 연산이 가능함.
+
+```java
+String[] strArr = {"aa","abb","acc","dd","aa"};
+Stream<String> stream = Stream.of(strArr);
+stream.distinct().limit(5).sorted().forEach(System.out::println);
+```
+```
+aa
+abb
+acc
+dd
+```
+
+**중간연산**
+
+* distinct() : 중복제거
+* filter(Predicate<T> predicate) : 조건에 안 맞는 요소 제외
+* limit(long maxSize) : 스트림 일부 잘라내기
+* skip(long n) : 스트림 일부 건너뛰기
+* peek(Consumer<T> action) : 스트림 요소 작업수행
+* sorted() : 스트림 요소 정렬
+* map, flatMap : 스트림 요소 반환
+
+* 모든 중간연산의 반환은 Stream 이며, map() 이 핵심 역할.
+
+**최종연산**
+
+* void forEach(Consumer<? super T> action) : 각 요소 지정된 작업 수행
+* long count() : 스트림 요소 개수 반환
+* Optional<T> max(Comparator<? super T> comparator) : 스트림 최대값 반환
+* Optional<T> min(Comparator<? super T> comparator) : 스트림 최소값 반환
+* Optional<T> findAny() : 스트림 요소 하나 반환
+* Optional<T> findFirst() : 첫 번째 요소
+* Object[] toArray() : 모든 요소 배열 반환
+* Optional<T> reduce(BinaryOperator<T> accumulator) : 스트림 요소 하나씩 줄여가며 계산
+* R collect(Collector<T,A,R> collector) : 스트림 요소 수집
+
+* 최종 연산은 reduce()와 collect() 가 핵심 역할.
+
+### 스트림 중간연산
+
+**skip(), limit()**
+
+```java
+Stream<T> skip(long n)
+Stream<T> limit(long maxSize)
+
+IntStream intStream = IntStream.rangeClosed(1, 10)		// 1 ~ 10 요소 가진 스트림
+intStream.skip(3).limit(5).forEach(System.out::print);	// 45678
+```
+
+**filter(),distinct()**
+
+* distinct()는 중복 제거, filter()는 주어진 조건에 맞지 않는 요소 걸러내기
+
+```java
+Stream<T> filter(Predicate<? super T> predicate)
+Stream<T> distinct()
+
+IntStream intStream = IntStream.of(1,2,2,3,3,3,4,5,5,6);
+intStream.distinct().forEach(System.out::print);	// 123456
+
+IntStream intStream = IntStream.rangeClosed(1, 10)			// 1 ~ 10 요소 가진 스트림
+intstream.filter(i -> i%2 ==0).forEach(System.out::print);	// 246810
+```
+
+**sorted()**
+
+* 스트림 정렬할 때 사용
+
+```java
+Stream<T> sorted()
+Stream<T> sorted(Comparator<? super T> comparator)	// 지정된 Comparator 정렬
+```
+
+**Comparator 메서드**
+
+```java
+comparing(Function<T, U> keyExtractor)
+comparing(Function<T, U) keyExtractor, Comparator<U> keyComparator)
+```
+
+* 스트림 요소가 Comparable을 구현한 경우, 매개변수 하나짜리를 사용하면되고 아니면 정렬기준을 지정해줘야함.
+
+**map()**
+
+```java
+Stream<R> map(Function<? super T, ? extends R> mapper)
+
+/*
+filterSteram.map(File::getName)
+	.filter(s -> s.indexOf('.') != -1)
+	.map(s -> s.substring(s.indexOf('.') + 1))
+	.map(String::toUpperCase)
+	.distinct()
+	.forEach(System.out::print);
+*/
+```
+
+* map도 중간연산자이기에 filter 처럼 하나의 스트림에 여러 번 적용가능함.
+
+**peek()**
+
+```java
+.peek(s->System.out.printf("filename=%s%n", s))	// 파일명 출력..
+```
+
+* 연산과 연산 사이에 올바르게 처리되었는지 확인하려면 peek()을 사용함.
+* forEach() 와 달리 스트림의 요소를 소모하지 않으므로 연산 사이에 여러 번 넣어도 문제 X
+* 주로 filter 나 map 의 결과를 확인할 때 사용함.
+
+**flatMap()**
+
+* 스트림의 스트림을 스트림으로 바꿔줌
+* 여러 배열에 담긴 문자열을 하나의 Stream으로써 사용할 때 flatMap을 사용하자.
+
+```java
+// map()
+Stream<String[]> -> (map(Arrays::stream)) -> Stream<Stream<String>>
+
+// flatMap()
+Stream<String[]> -> (flatMap(Arrays::stream)) -> Stream<String>
+```
+
+
+
 </div>
 </details>
