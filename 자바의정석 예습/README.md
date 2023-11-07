@@ -4928,5 +4928,117 @@ public class Ex14_2 {
 
 * Supplier(get), Consumer(accept), Predicate(test), Function(apply) 4개의 사용방법을 잘알아두자.
 
+### Predicate 결합
+
+* Predicate 매개변수를 하나 받아 boolean 반환.
+* and, or, not으로 연결하여 하나의 식을 구성하는 것 처럼 여러 Predicate를 연결하여 하나로 결합할 수 있음.
+* default, static, 추상메서드 인터페이스가 가질 수 있는 메서드를 가질 수 있음
+
+```java
+Predicate<Integer> notP = p.negate();	// ! not
+Predicate<Integer> all = notP.and(q).or(r);		// 100 <= i && i < 200 || i % 2 == 0
+
+System.out.println(all.test(2))		// true
+```
+
+### Predicate 결합 예제
+
+```java
+package ch14;
+
+import java.util.function.Predicate;
+
+public class Ex14_3 {
+
+	public static void main(String[] args) {
+		Predicate<Integer> p = i -> i < 100;
+		Predicate<Integer> q = i -> i < 200;
+		Predicate<Integer> r = i -> i%2 == 0;
+		Predicate<Integer> notP = p.negate();	// i >= 100;
+		
+		Predicate<Integer> all = notP.and(q.or(r));
+		System.out.println(all.test(150));
+		
+		String str1 = "abc";
+		String str2 = "abc";
+		
+		Predicate<String> p2 = Predicate.isEqual(str1);
+		boolean result = p2.test(str2);
+		System.out.println(result);
+	}
+}
+```
+```
+true
+true
+```
+
+### 컬렉션 프레임웍과 함수형 인터페이스
+
+![Alt text](image-18.png)
+
+```java
+list.forEach(i -> System.out.print(i+ ","));	// list 모든 요소 출력
+list.removeIf(x -> x%2==0 || x%3==0);	// 2 or 3의 배수 제거
+list.replaceAll(i -> i*10);		// 모든 요소 10 곱하기
+// map의 모든 요소 {k, v} 형식 출력
+map.forEach((k,v) -> System.out.print("{"+k+","+v+"}","));
+```
+
+### 메서드 참조
+
+* 람다식이 하나의 메서드만 호출하는 경우 메서드 참조를 통해 더 간략히 나타낼 수 있음.
+* 클래스이름::메서드이름 형식으로 나타냄.
+
+```java
+Function<String, Integer> f = (String s) -> Integer.parseInt(s);
+
+// 메서드 참조식
+Function<String, Integer> f = Integer::parseInt;
+```
+
+### 메서드 참조 예제
+
+```java
+import java.util.function.Function;
+
+public class Ex14_4 {
+
+	public static void main(String[] args) {
+		
+//		Function<String, Integer> f = (String s) -> Integer.parseInt(s);
+//		System.out.println(f.apply("100")+200);	// 숫자 300
+		
+		// 메서드 참조식 -> 클래스이름::메서드이름
+		Function<String, Integer> f = Integer::parseInt;
+		System.out.println(f.apply("100")+200);	// 300
+	}
+}
+```
+
+* 헷갈리면 메서드 참조식을 다시 람다식으로 나타내는 연습을 해보자.
+
+### 생성자의 메서드 참조
+
+```java
+// 람다식
+Supplier<Myclass> s = () -> new MyClass();	// 객체를 생성해서 줌.
+
+// 메서드 참조
+Supplier<Myclass> s = () -> MyClass::new
+
+// 람다식
+Function<Integer, MyClass> s = (i) -> new MyClass(i);
+
+// 메서드 참조
+Function<Integer, Myclass> s = MyClass::new;
+
+// 람다식
+Function<Integer, int[]> f = x -> new int[x];
+
+// 메서드 참조
+Function<Integer, int[]> f2 = int[]::new;
+```
+
 </div>
 </details>
