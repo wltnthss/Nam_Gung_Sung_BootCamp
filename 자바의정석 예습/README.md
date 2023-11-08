@@ -5317,7 +5317,188 @@ Stream<String[]> -> (map(Arrays::stream)) -> Stream<Stream<String>>
 Stream<String[]> -> (flatMap(Arrays::stream)) -> Stream<String>
 ```
 
+### Optional<T>
 
+* Optional<T>는 T타입의 객체를 감싸는 래퍼 클래스.
+* Optional타입의 객체에는 모든 타입의 객체를 담을 수 있음.
+* 최종 연산의 결과를 그냥 반환하는게 아니라 Optional 객체에 담아서 반환 하면 반환된 결과가 null인지 간단히 처리 가능함.
+* 널 체크를 위한 if문 없이도 NullPointerException이 발생하지 않는 보다 간결하고 안전한 코드 작성 가능.
+
+```java
+public final class Optional<T> {
+	private final T value;	// 모든 타입에 대한 객체 저장 가능
+}
+
+public class OptionalTest {
+
+	public static void main(String[] args) {
+		String str1 = "abc";
+		Optional<String> optional1 = Optional.of(str1);
+		Optional<String> optional2 = Optional.of("abc");
+		Optional<String> optional3 = Optional.ofNullable(null);
+
+		System.out.println(optional1.get());	// 저장된 값 반환, null이면 예외발생
+		System.out.println(optional3.orElse("ABC"));	// null일 때 반환할 값 지정, 값이 있으면 값 반환
+		System.out.println(optional1.orElseGet(() -> new String()));	// 람다식 사용가능 String::new
+		System.out.println(optional3.orElseThrow(NullPointerException::new));	// null 이면 예외발생
+
+		// isPresent, ifPresent
+		if (Optional.ofNullable(optional1).isPresent()) {	// 값이 null이면 false, 아니면 true
+			System.out.println(str1);	// abc 출력됨.
+		}
+
+		Optional.ofNullable(str1).ifPresent(System.out::println);	// 널이 아닐 때만 작업 수행, 아니면 아무 일도 안함.
+	}
+}
+
+Optional<String> optional = Optional.empty();	// 빈 객체로 초기화
+```
+
+* null 대신 빈 Optional<T> 객체를 사용하자.
+  * NullpointException 줄이기 위함.
+
+#### OptionalInt, OptionalLong, OptionalDouble
+
+* IntStream과 같은 기본형 스트림의 최종 연산 일부는 Optional 대신 OptionalInt, OptionalLong, OptionalDouble을 반환함.
+  * 더 높은 성능을 위함.
+
+```java
+public final class OptionalInt {
+	private final boolean isPresent;	// 값 저장되어 있으면 true
+	private final int value;	// int 타입 변수
+}
+
+OptionalInt optInt1 = OptionalInt.of(0)	// isPresent : true
+OptionalInt optInt2 = OptionalInt.empty()	// isPresent : false
+
+```
+
+* Optional 에서는 get()으로 가져왔으나 타입에 따라 getAsInt(), getAsLong(), getAsDouble()에 유의하자.
+
+### 스트림의 최종연산 
+
+* 최종 연산은 스트림의 요소를 소모해서 결과를 만들어냄.
+* 그러므로 최종 연산 후에는 스트림은 닫히게 되고 더 이상 사용할 수 없음.
+
+```java
+void forEach(Consumer<? super T> action)		// 병렬 경우 순서 보장 X
+void forEachOrdered(Consumer<? super T> action)	// 병렬 경우에도 순서 보장 O
+
+public class OptionalTest1 {
+
+	public static void main(String[] args) {
+		IntStream.range(1, 10).sequential().forEach(System.out::print);	// 순서 보장 x
+		System.out.println();
+		IntStream.range(1, 10).sequential().forEachOrdered(System.out::print);	// 순서 보장 o
+		System.out.println();
+		IntStream.range(1, 10).parallel().forEach(System.out::print);	// 순서 보장 x
+		System.out.println();
+		IntStream.range(1, 10).parallel().forEachOrdered(System.out::print);	// 순서 보장 o
+	}
+}
+```
+
+* sequential() -> 직렬스트림
+* parallel() -> 병렬스트림 : 여러 쓰레드가 나눠서 작업 (순서보장이 안됨) 순서보장하기위해 forEachOrdered 사용함.
+
+**조건검사**
+
+```java
+boolean allMatch (Predicate<? super T> predicate)	// 모든 요소 조건 만족하면 true
+boolean anyMatch (Predicate<? super T> predicate)	// 한 요소라도 조건 만족하면 true
+boolean noneMatch (Predicate<? super T> predicate)	// 모든 요소가 만족하지 않으면 true
+
+boolean hasFailedStu = stuStream.anyMatch(s -> s.getTotalScore() <= 100);	// 낙제자가 있는지 여부?
+
+Optional<T> findFirst()	// 첫 번째 요소 반환, 결과가 null일 수 있음
+Optional<T> findAny()	// 아무거나 하나 반환, 병렬 스트림에 사용
+```
+
+**reduce()**
+
+* 스트림의 요소를 하나씩 줄여가며 누적연산 수행함.
+
+```java
+Optional<T> reduce(BinaryOperator<T> accumulator)	// 초기값이 없으므로 Optional null 파악
+T 	reduce(T identity, BinaryOperator<T> accumulator)	// identity - 초기값, accumulator - 이전 연산결과와 스트림의 요소에 수행할 연산
+
+int count = intStream.reduce(0, (a,b) -> a + 1);
+int sum = intStream.reduce(0, (a,b) -> a + b);
+
+// 이것을 잘 알아두자
+int a = identity;	// 누적 결과를 저장할 변수
+
+for(int b : stream){
+	a = a + b;	// sum()
+}
+```
+
+### collect() 와 collectors
+
+* 최종 연산 중에서도 가장 복잡하고 유용하게 활용될 수 있는 것이 collect()임.
+* collect() 가 스트림의 요소를 수집하려면, 어떻게 수집할 것인가에 대한 방법이 바로 컬렉터(collector) 임.
+
+```java
+object collect(Collector collector)	// Collector 를 구현한 클래스의 객체를 매개변수로
+object collect(Supplier supplier, BiConsumer accumulator, BiConsumer combiner)	// 잘안쓰임
+
+public interface Collector<T, A, R> {	// T(요소)를 A에 누적한 다음, 결과를 R로 변환하여 반환
+	Supplier<A> supplier();
+	BiConsumer<A, T> accumulator();
+	...
+}
+
+// 스트림 배열로 변환
+Student[] stuNames = studentStream.toArray(Student[]::new);	// OK 람다식 : i -> new Student[i]
+Student[] stuNames = studentStream.toArray();	// 에러
+```
+
+* reduce() 는 리듀싱 (스트림 요소 전체에 대한 리듀싱)
+* collect() 는 그룹별 리듀싱의 차이점이 있음
+* Collectors 클래스는 다양한 기능의 컬렉터를 제공함.
+
+**스트림 통계**
+
+* counting(), summingInt()
+
+```
+long count = stuStream.count();
+long count = stuStream.collect(counting());	// Collectors.counting()
+```
+
+* collect 를 통해 그룹별로 총점 계산이 가능함.
+
+**리듀싱 reducing()**
+
+* collectors 가 제공함. reduce 와 동일하나 그룹별 리듀싱이 가능함.
+
+```java
+Collector reducing(BinaryOperator<T> op)
+Collector reducing(T identity, BinaryOperator<T> op)
+```
+
+* joining() - 문자열 스트림의 요소를 모두 연결
+
+```java
+String studentNames = stuStream.map(Student::getName).collect(joining());
+```
+
+### 스트림의 그룹화화 분할
+
+* partitioningBy()는 스트림을 2분할함.
+* groupingBy()는 스트림을 n분할함.
+* 둘 다 collectors에 있는 메서드임.
+
+```java
+Map<Boolean, List<Student>> stuBySex = stuStream.collect(partitioningBy(Student::isMale));	// 학생들을 성별로 분할
+List<Student> maleStudent = stuBySex.get(true)	// Map에서 남학생 목록을 얻음
+```
+
+#### 스트림의 그룹화 - groupingBy()
+
+```java
+Map<Integer, List<Student>> stuByBan = stuStream.collect(groupingBy(Student::getBan, toList()));	// toList() 생략가능
+```
 
 </div>
 </details>
