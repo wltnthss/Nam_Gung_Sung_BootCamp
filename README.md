@@ -6,7 +6,12 @@
 3. 개인 프로젝트(4주) - Spring으로 쇼핑몰 만들기, JavaScript심화, DB모델링, git, Spring Boot + JPA
 4. 팀 프로젝트(8주) - 1차 개발, 교차 테스트, 1차 개발 리뷰, 2차 개발, 최종 테스트, 2차 개발 리뷰. 프로젝트 발표
 
-## 자바의 정석 나만의 요약집 총정리 1~14장 (하루에 1번씩 출퇴근길에 보자) 각 챕터별 예제는 맨밑에 ↓
+
+## 자바의 정석 나만의 요약집 정리 1~14장 (하루에 1번씩 출퇴근길에 보기)
+
+<details>
+<summary style="font-size:20px">자바의 정석</summary>
+<div markdown="1">
 
 **객체지향 4대 핵심개념 적고, 한줄로 설명**
 
@@ -238,4 +243,75 @@
 
 * 기본형 값들을 객체로 변환하여 작업을 수행할 때 사용함.
 * 오토박싱 : 기본형 값을 래퍼 클래스의 객체로 자동 변환
+
+**컬렉션 프레임웍**
+
+* 컬렉션 : 다수의 객체를 모아놓은 것
+* 프레임웍 : 표준화된 프로그래밍 방식
+* 컬렉션 프레임웍 : 다수의 객체를 모아놓은 표준화된 프로그래밍 방식
+
+**컬렉션 프레임웍 핵심 인터페이스**
+
+1. List
+   * 순서 O, 중복 O
+   * LinkedList, ArrayList, Stack, Vector
+   * Collection 인터페이스를 상속받고 있음
+2. Set
+   * 순서 X, 중복 X
+   * HashSet, TreeSet
+   * Collection 인터페이스를 상속받고 있음
+3. Map
+   * 순서 X, Key 는 중복 X, Value 는 중복 O
+
+**ArrayList**
+
+* Vector는 동기화되어있지만 ArrayList는 동기화되어있지 않음.
+* List 인터페이스를 구현하여 순서가 유지되고 중복을 허용함.
+
+**ArrayList 삭제과정**
+
+1. ArrayList는 index 번째 요소를 삭제함. ex) data[0] ~ data[5]
+2. 중간 데이터 data[2] 2번째 요소를 삭제한다는 가정하에 list.remove(2); 호출함.
+3. 삭제할 데이터 아래의 데이터를 한칸씩 위로 복사하여 삭제할 데이터 덮어씌우기
+4. System.arraycopy(data, index+1, data, index, size-index-1)
+5. 데이터가 한칸씩 옮겨졌으므로 마지막 데이터는 null로 변경 data[size-1] = null;
+6. 데이터가 삭제되었으므로 size하나 감소 size--;
+7. 마지막 데이터를 삭제하는 경우는 복사과정을 건너띄고 5번부터 수행함.
+
+**LinkedList**
+
+* 다음요소와 이전요소의 주소, 데이터를 저장할 수 있음.
+* ArrayList에 비해서 접근 속도는 느리나, 비순차적인 데이터의 추가/삭제는 빠름.
+* ArrayList가 접근 속도는 더 빠르고, 순차적인 데이터의 추가/삭제는 더 빠름.
+
+**스택 & 큐**
+
+* 스택 (Stack) - LastInFirstOut (LIFO) 구조 ex) 수식괄호검사, 브라우저 뒤/앞
+  * 저장 - push(), 추출 - pop()
+  * ArrayList 로 구현하는 것이 유리함
+* 큐 (Queue) - FirstInFirstOut (FIFO) 구조 ex) 최근사용문서, 버퍼
+  * 저장 - offer(), 추출 - poll()
+  * LinkedList 로 구현하는 것이 유리함 (데이터를 꺼낼 때마다 데이터 복사가 발생)
+
+**Comparator와 Comparable**
+
+* Comparable - 기본 정렬기준을 구현하는데 사용하며 기본적으로 제공하는 인터페이스임.
+* Comparator - 기본 정렬기준 외에 다른 기준으로 정렬하고자 할 때 사용.
+
+**이진 검색 트리(binary search tree)**
+
+1. 모든 노드는 최대 두 개의 자식노드를 가질 수 있음
+2. 왼쪽 자식 노드 값이 부모 노드의 값보다 작고 오른쪽은 부모보다 커야함.
+3. 검색과 정렬에 유리함.
+4. 노드의 추가 삭제에 시간이 오래 걸림(배열보다 느림)
+5. TreeSet, TreeMap 사용
+
+**해싱**
+
+* 해시함수를 이용해서 해시테이블에 데이터를 저장하고 검색하는 기법
+* ArrayList와 LinkedList 의 조합
+  
+</div>
+</details>
+
 
