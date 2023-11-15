@@ -326,22 +326,40 @@
 **제한된 지네릭 클래스**
 
 * extends 로 대입할 수 있는 타입을 제한함.
-* <T extends Animal> - Animal 의 자식타입만 지정가능함.
+
+```java
+<T extends Animal> // Animal 의 자식타입만 지정가능함.
+```
 
 **와일드카드**
 
 * 하나의 참조 변수로 대입된 타입이 다른 객체를 참조 가능
 
-1. <? extends T> - T의 자손들 저장 가능
-2. <? super T> - T의 부모들 저장 가능
-3. <?>   - 모든 타입이 가능 (T extends Object와 동일함) 
+```java
+<? extends T>  - T의 자손들 저장 가능
+<? super T>    - T의 부모들 저장 가능
+<?>            - 모든 타입이 가능 (T extends Object와 동일함) 
+```
 
 **지네릭 메서드**
 
 * 메서드 선언부에 지네릭 타입이 선언된 메서드 
-* static <T> void sort(List<T> list, Comparator<? super T> c)
 * 메서드를 호출할 때마다 타입을 대입할 수 있음.
 
+```java
+static <T> void sort(List<T> list, Comparator<? super T> c)
+```
+
+**열거형**
+
+* 관련된 상수들을 묶어 놓은 것.
+* enum 클래스 에 정의된 값들은 객체.
+* 열거형의 생성자는 private(외부의 호출을 막기위함)
+
+**애너테이션**
+
+* 프로그래밍에 영향을 주지 않고 주석처럼 사용하며 유용한 정보를 제공함.
+* 메타 애너테이션 : 애너테이션의 적용대상이나 유지기간을 지정하는데 사용함. (@Target, @Inherited)
 
 </div>
 </details>
