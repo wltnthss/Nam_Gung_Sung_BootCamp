@@ -13,6 +13,10 @@
 <summary style="font-size:20px">자바의 정석</summary>
 <div markdown="1">
 
+**기본형타입 8가지**
+
+* boolean(1), char(2), byte(1), short(2), int(4), long(8), float(4), double(8)
+
 **객체지향 4대 핵심개념 적고, 한줄로 설명**
 
 1. 캡슐화 : 외부로부터 데이터를 보호하기 위해서
@@ -56,6 +60,11 @@
 * static 메서드는 인스턴스 메서드 사용 불가 why? 
   * static 메서드는 클래스가 메모리에 올라갈 때 생성되는 반면 객체는 생성시에 만들어지므로 없을 경우가 있을 수도 있어서.
 * 인스턴스 메서드에서는 static 메서드를 호출 가능함.
+
+**static을 붙이는 경우**
+
+1. 클래스의 멤버변수 중에서 모든 인스턴스에 공통된 값을 유지하는 경우 static을 붙임.
+2. 인스턴스 변수나, 인스턴스 메서드를 사용하지 않는 메서드에 static을 붙임.
    
 **오버로딩 조건3가지**
 
@@ -238,6 +247,17 @@
 
 1. 멀티쓰레드 환경에서 동기화를 고려하지 않아도됨.
 2. GC 성능 향상.
+
+**StringBuffer vs StringBuilder**
+
+* 두 가지 모두 자신의 주소를 반환하며 가변적인 문자열을 다룰 때 유리함.
+* StringBuffer는 동기화를 지원하고, StringBuilder는 동기화를 지원하지 않습니다.
+* 쓰레드와 관련이 없으면 성능은 StringBuilder > StringBuffer > String 이므로 관련이 없을 때는 이와 같이 사용하자.
+* 사용법은 동일함.
+
+**Math 클래스 생성자가 private인 이유?**
+
+* Math 클래스는 인스턴스변수가 하나도 없어서(전부 static) 인스턴스를 생성할 필요가 없기 때문임.
 
 **래퍼클래스**
 
@@ -433,6 +453,14 @@ static <T> void sort(List<T> list, Comparator<? super T> c)
 * compute() 추상 메서드를 통해 구현하여 사용.
 * fork() - 작업을 나누는 비동기 메서드
 * join() - 작업을 합치는 동기 메서드
+
+**스트림**
+
+1. 스트림 생성 
+2. 중간 연산 (n번 수행 가능)
+    * skip, limit, distinct, filter, map, flatmap, peek, sorted
+3. 최종 연산 (1번)
+    * foreach, sum, count, max, min, allMatch, anyMatch, noneMatch, findFirst, reduce, collect
 
 </div>
 </details>
