@@ -7,7 +7,7 @@
 4. 팀 프로젝트(8주) - 1차 개발, 교차 테스트, 1차 개발 리뷰, 2차 개발, 최종 테스트, 2차 개발 리뷰. 프로젝트 발표
 
 
-## 자바의 정석 나만의 요약집 정리 1~14장 (하루에 1번씩 출퇴근길에 보기)
+## 자바의 정석 나만의 요약집 정리 1~13장 
 
 <details>
 <summary style="font-size:20px">자바의 정석</summary>
@@ -466,3 +466,11 @@ static <T> void sort(List<T> list, Comparator<? super T> c)
 </details>
 
 
+## ORACLE 나만의 요약집 정리
+
+<details>
+<summary style="font-size:20px">ORACLE</summary>
+<div markdown="1">
+
+</div>
+</details>
