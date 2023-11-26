@@ -267,6 +267,45 @@ WHERE
             );
 ```
 
+**CONSTRAINT**
+
+* 데이터의 무결성을 지키기 위해 제한된 조건
+* 즉, 테이블이나 속성에 부적절한 데이터가 들어오는 것을 사전에 차단하도록 정해 놓은 것
+
+* NOT NULL
+    * NULL값 설정 불가
+* UNIQUE
+    * 중복간 설정 불가
+* CHECK
+    * 지정한 조건에 맞지 않는 값은 설정할 수 없음.
+* PRIMARY KEY
+    * 테이블에는 단 하나의 PK만 허용됨.
+    * UNIQUE 컬럼에 대한 인덱스가 자동 생성됨.
+    * 중복값과 NULL값 설정 불가
+* FOREIGN KEY
+    * 부모 테이블의 값과 일치하거나 NULL 이어야함.
+    * 참조하고자 하는 컬럼이 PK 또는 UNIQUE 제약조건이 있어야함.
+* DEFAULT
+
+```SQL
+-- 제약 조건 조회
+SELECT * FROM USER_CONSTRAINTS WHERE TABLE_NAME = 'S_EMP';
+
+-- 제약 조건 추가
+ALTER TABLE S_EMP MODIFY MAILID NOT NULL;
+ALTER TABLE S_EMP ADD CONSTRAINT UNIQUE_MAILID UNIQUE(MAILID);
+ALTER TABLE S_EMP ADD CONSTRAINT PK_ID PRIMARY KEY(ID);
+
+-- 제약 조건 삭제
+ALTER TABLE S_EMP DROP CONSTRAINT PK_S_EMP;
+ALTER TABLE S_EMP DROP CONSTRAINT UNIQUE_MAILID;
+```
+
+**DICTIONARY**
+
+* 데이터베이스에 대한 정보를 가짐
+* ORACLE SERVER에 의해서 생성되고 유지보수
+
 **INDEX 효율적 사용**
 
 1. INDEX가 존재하지만 사용되지 않는 경우
