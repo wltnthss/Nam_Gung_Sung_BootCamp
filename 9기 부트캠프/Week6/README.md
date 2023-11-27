@@ -306,6 +306,66 @@ ALTER TABLE S_EMP DROP CONSTRAINT UNIQUE_MAILID;
 * 데이터베이스에 대한 정보를 가짐
 * ORACLE SERVER에 의해서 생성되고 유지보수
 
+**SEQUENCE**
+
+* 오라클에서는 자동 증가 컬럼을 사용할 수가 없음.
+* 때문에 오라클에서 컬럼의 값을 증가시키기 위해서는 주로 시퀀스를 사용함
+
+* INCREMENT BY : 시퀀스 실행 시 증가시킬 값
+* START WITH : 시퀀스의 시작값이다. (MINVALUE과 같거나 커야 한다)
+* MINVALUE : 시퀀스가 시작되는 최솟값이다.
+* MAXVALUE : 시퀀스가 끝나는 최댓값이다.
+* NOCYCLE | CYCLE : NOCYCLE (반복안함), CYCLE(시퀀스의 최댓값에 도달 시 최솟값 1부터 다시시작)
+* NOCACHE | CACHE : NOCACHE(사용안함), CACHE(캐시를 사용하여 미리 값을 할당해 놓아서 속도가 빠르며, 동시 사용자가 많을 경우 유리)
+* NOORDER | ORDER : NOORDER(사용안함), ORDER(요청 순서로 값을 생성하여 발생 순서를 보장하지만 조금의 시스템 부하가 있음)
+
+```SQL
+-- 해당 유저에 생성된 모든 시퀀스 확인 방법
+SELECT * FROM user_sequences;
+
+-- SEQUENCE 생성
+CREATE SEQUENCE ID
+    INCREMENT BY 1
+    START WITH 26
+    MINVALUE 1
+    MAXVALUE 99999
+    NOCYCLE
+    NOCACHE
+    NOORDER;
+
+-- SEQUENCE 삭제
+DROP SEQUENCE ID;
+
+-- SEQUENCE 수정
+ALTER SEQUENCE ID MAXVALUE 9999;
+ALTER SEQUENCE ID INCREMENT BY 2;
+
+-- SEQUENCE 사용, NEXTVAL을 사용하여 일련번호를 생성할 수 있음.
+SELECT 
+    ID.NEXTVAL
+FROM 
+    DUAL;
+```
+**INDEX**
+
+* 테이블의 데이터를 좀 더 빠르게 검색하기 위해 사용하는 데이터베이스 Object.
+* ORACLE SERVER 가 최적화 방법을 따라 어떤 Index를 사용할 것인지, 사용하지 않을 것인지 결정
+* B+Tree 의 검색방법으로 디스크 입출력 횟수를 줄임.
+* 자동으로 생성되기도 하고 사용자가 필요에 의해 만들기도함.
+* INDEX는 논리적, 물리적으로 테이블과는 독립적임.
+* ORACLE SERVER가 자동적으로 INDEX를 사용하고 유지보수함.
+* 인덱스는 검색속도를 증가시키지만 항상 빠른 것은 아니고, 많이 만든다고해서 좋은 것도 아님.
+* 테이블과 연관된 인덱스가 많을 수록 오라클 서버 부담은 증가함.
+
+```SQL
+-- INDEX 조회
+SELECT * FROM IND;
+
+-- INDEX 생성
+-- CREATE INDEX INDEX_NAME ON TABLE_NAME(COLUMN...)
+CREATE INDEX T_INDEX ON S_EMP(NAME);
+```
+
 **INDEX 효율적 사용**
 
 1. INDEX가 존재하지만 사용되지 않는 경우
@@ -340,18 +400,110 @@ WHERE
 
 **INDEX 생성, 비생성**
 
-1. 인덱스를 만들지 않아야 될 때
+1. 인덱스 생성 권장 X
     * 테이블이 자주 변경될 때
     * 컬럼이 조회의 조건으로 사용되는 경우가 별로 없을 때
-    * 인덱스는 검색속도를 증가시키지만 항상 빠른 것은 아니고, 많이 만든다고해서 좋은 것도 아님.
+    * 테이블이 작거나, 조회가 행의 10% 정도 이상을 검색할 때
+2. 인덱스 생성 권장 O
+    * 컬럼에 NULL값이 많이 포함되있을 때
+    * 1개 이상의 컬럼이 함께 WHERE, JOIN조건으로 자주 사용될 때
+    * 테이블이 크고, 테이블에서 조회되는 행의 수가 전체의 10%정도 일 때
 
 **VIEW**
 
 * 간단한 뷰에서는 DML 연산 수행가능
+* 테이블이나 다른 뷰를 기초로 한 가상의 테이블
+* 선택적인 내용을 보여줌으로써 데이터베이스에 대한 액세스를 제한함.(보안적인 강점)
+* 한 개의 뷰로 여러 테이블에 대한 데이터 검색 가능
+* UNION, JOIN, GROUP BY 를 사용한 쿼리는 DML 사용 불가함.
+
+```SQL
+-- VIEW 생성
+CREATE OR REPLACE VIEW MY_VIEW AS
+(
+SELECT 
+    *
+FROM 
+    S_EMP
+);
+-- VIEW 조회
+SELECT * FROM MY_VIEW;
+SELECT * FROM USER_VIEWS;
+
+-- VIEW 삭제
+DROP VIEW MY_VIEW;
+```
+
+**SYNONYM**
+
+* ALIAS 같이 이름을 줄여주는 역할이며 테이블의 이름을 설정해주는 것
+* 특정 OBJECT에 부여하는 또 다른 이름이며 사용자의 편의나 참조를 빠르게 하기 위해 사용함.
+* 
+
+```SQL
+CREATE [OR REPLACE] [PUBLIC]
+SYNONYM '[스키마명].시노님명'
+    FOR '스키마명.대상오브젝트명'
+
+-- 시노님 생성
+CREATE SYNONYM MY_EMP FOR S_EMP;
+
+-- 시노님 조회
+SELECT * FROM MY_EMP;
+
+-- 시노님 삭제
+DROP SYNONYM MY_EMP;
+```
 
 **NVL**
 
+* NULL 값을 포함하는 컬럼을 지정된 값으로 변경하는데 사용함.
+* NVL(형식1, 형식2) - 형식 1 : NULL값 포함 컬럼, 형식 2 : 변경하려는 값
+* NVL2(형식1, 형식2, 형식 3) - NULL이면 형식3, 아니면 형식2를 출력함.
+
+```SQL
+SELECT ID, NAME, NVL(REGION_ID, 10) FROM S_DEPT;
+SELECT ID, NAME, NVL2(REGION_ID, 20, 30) FROM S_DEPT;
+```
+
 **DECODE**
+
+* 값을 비교하여 해당하는 값을 돌려주는 함수
+* CASE WHEN THEN 을 사용하지만 오라클에서는 DECODE를 자주 사용함.
+* DECODE(형식, 비교값1, 결과치1, 기본치)
+
+```SQL
+SELECT 
+    SALARY,
+    DECODE(SALARY/1000, 0, 'E', 'A')    -- 0이면 'E', 아니면 'A'
+FROM 
+    S_EMP;
+```
+
+**TRIGGER**
+
+* 임의의 테이블에 DML이 수행 됐을 때, 데이터베이스에서 **자동적으로 동작하도록 작성된 프로그램**임.
+* 테이블과 별도로 데이터베이스에 저장됨.
+
+```SQL
+CREATE [ OR REPLACE ] TRIGGER 트리거명
+BEFORE | AFTER
+[ 동작(INSERT, UPDATE, DELETE) ] ON 테이블명 
+[ REFERENCING  NEW | OLD  TABLE AS 테이블명 ]
+[ FOR EACH ROW ]
+[ WHEN 조건식 ]
+트리거 BODY문
+
+CREATE OR REPLACE TRIGGER oracle_trigger
+   BEFORE
+   INSERT ON oracleStudy
+   REFERENCING NEW TABLE AS new_trigger
+   FOR EACH ROW
+   WHEN new_trigger.점수 = ''
+   BEGIN
+     SET new_table.점수 = '0';
+   END;
+```
 
 ## ORACLE 실습
 
@@ -587,4 +739,110 @@ HAVING
                   )
 GROUP BY 
     TITLE; 
+
+
+-- PIVOT
+SELECT 
+    *
+FROM 
+    (
+        SELECT 
+            ID, 
+            TO_CHAR(START_DATE, 'MM') || '월' YYM
+        FROM 
+            S_EMP
+    )
+PIVOT
+    (
+        COUNT(*)
+        FOR YYM IN ('01월', '02월', '03월')
+    );
+
+-- DECODE
+SELECT 
+    ID,
+    SUM(DECODE(TO_CHAR(START_DATE, 'MM'), '01', 1, 0)) "1월",
+    SUM(DECODE(TO_CHAR(START_DATE, 'MM'), '02', 1, 0)) "2월",
+    SUM(DECODE(TO_CHAR(START_DATE, 'MM'), '03', 1, 0)) "3월"
+FROM 
+    S_EMP
+GROUP BY 
+    ID;
+
+-- ROLLUP 그룹별 합계
+SELECT 
+    DEPT_ID, TITLE, COUNT(*)
+FROM 
+    S_EMP
+GROUP BY 
+    ROLLUP(DEPT_ID, TITLE);
+    
+-- CUBE 그룹별 합계 및 소계
+SELECT 
+    DEPT_ID, TITLE, COUNT(*)
+FROM 
+    S_EMP
+GROUP BY 
+    CUBE(DEPT_ID, TITLE)
+ORDER BY 
+    DEPT_ID;
+
+-- RANK 행별 순위 계산
+SELECT 
+    ID, 
+    NAME, 
+    DEPT_ID, 
+    SALARY , 
+    RANK() OVER(PARTITION BY DEPT_ID ORDER BY SALARY) RANK
+FROM 
+    S_EMP;
+
+-- 자신의 급여가 자신이 속한 부서의 평균 급여보다 적은 직원의 이름, 급여, 부서번호
+SELECT 
+    NAME, DEPT_ID, SALARY
+FROM 
+    S_EMP E1
+WHERE 
+    SALARY < 
+            (
+            SELECT 
+                AVG(SALARY)
+            FROM 
+                S_EMP E2
+            WHERE 
+                E1.DEPT_ID = E2.DEPT_ID
+            GROUP BY 
+                DEPT_ID
+            )
+;
+
+-- 본인의 급여가 각 부서별 평균 급여 중 어느 한 부서의 평균 급여보다 적은 급여를 받는 직원에 대해 이름, 급여, 부서번호를 출력하시오
+SELECT 
+    NAME, SALARY, DEPT_ID
+FROM 
+    S_EMP E1
+WHERE
+    SALARY < ANY(
+                SELECT 
+                    AVG(SALARY)
+                FROM 
+                    S_EMP E2
+                GROUP BY 
+                    DEPT_ID
+                );
+
+-- 본인이 다른 사람의 관리자로 되어 있는 직원의 사번, 이름, 직책, 부서번호
+SELECT 
+    ID, NAME, TITLE, DEPT_ID
+FROM 
+    S_EMP E1
+WHERE 
+    EXISTS (
+            SELECT 
+                ID
+            FROM 
+                S_EMP E2
+            WHERE 
+                E1.ID = E2.MANAGER_ID
+            );
 ```
