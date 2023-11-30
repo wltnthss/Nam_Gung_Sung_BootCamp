@@ -43,5 +43,8 @@
 
 * attribute : html 내의 태그
 * property : 태그가 객체가 되어 iv역할을 하는 것
-* ex) <h1 title = "header"> Hello HTML5 </h1>
+
+```html
+<h1 title = "header"> Hello HTML5 </h1>
+```
 * attribute는 title, property는 header, Hello HTML5 임.
