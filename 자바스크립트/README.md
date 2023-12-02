@@ -67,6 +67,18 @@ typeof NaN  // number
 * NaN은 자신과 일치하지 않는 유일한 값
 * +연산자는 피연산자 중 하나 이상이 문자열인 경우 문자열 연결 연산자로 동작함.
 
+**단축평가**
+
+```js
+true || 'any'   // true
+false || 'any'  // 'any'
+true && 'any'   // 'any'
+false && 'any'  // false
+```
+
+* && 논리곱 연산의 결과는 두 번째 피연산자가 결정
+* || 논리합 연산의 결과는 첫 번째 피연산자가 결정
+
 **배열**
 
 ```js
@@ -229,6 +241,7 @@ person.sayHello = function(){
 
 console.log(person) // {firstName: 'John', lastName: 'Doe', age: 50, eyeColor: 'blue'}
 console.log(person.firstName)   // John
+console.log(person['firstname]) // John
 person.sayHello();
 
 for(var x in person){
@@ -243,11 +256,15 @@ var myObject = {
     favoriteHobby : "golf",
     introduce: function(){
         return this.favoriteFruit + " " + this.favoriteHobby
+    },
+    hi(){
+        console.log('Hi ' + this.favoriteFruit)
     }
 }
 
 console.log(myObject.favoriteFruit)     // Apple
 console.log(myObject.introduce())   // Apple golf
+console.log(myObject.hi())  // Hi Apple (ES6 메서드 축약 표현)
 
 // 3. 생성자 객체 정의
 function Person1(name, age){
@@ -264,6 +281,7 @@ console.log(obj.toString()) //name=Javascript, age=100
 ```
 
 * 같은 생성자로 생성한 객체라도 서로 다른 함수를 가질 수 있음.
+* 프로퍼티 키를 중복 선언하면 나중에 선언한 프로퍼티가 먼저 선언한 프로퍼티를 덮어씀.
 
 **Prototype (프로토타입)**
 
@@ -300,4 +318,28 @@ obj2.name = "bbb"
 
 console.log(obj.getName())  // aaa
 console.log(obj2.getName()) // bbb
+```
+
+**this**
+
+* 함수를 호출하는 객체를 의미함.
+
+```js
+function Person5(name, age){
+    this.name = name;
+    this.age = age;
+    console.log("[" + this.name + ", " + this.age + "]")    
+}
+
+var p = Person5("홍길동", 20)   // [홍길동, 20]
+var p2 = Person5("강감찬", 25)
+
+console.log(p)  // Person5 {name: '홍길동', age: 20}
+console.log(p2) // undefined
+
+var p3 = {};
+var p4 = new Object();
+
+Person5.call(p3, "Sebin", 11);      //[Sebin, 11]
+Person5.apply(p4, ["Yebin", 16]);   //[Yebin, 16]
 ```
