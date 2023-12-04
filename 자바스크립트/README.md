@@ -343,3 +343,28 @@ var p4 = new Object();
 Person5.call(p3, "Sebin", 11);      //[Sebin, 11]
 Person5.apply(p4, ["Yebin", 16]);   //[Yebin, 16]
 ```
+
+**스프레드문법**
+
+```js
+console.log(...[1,2,3]) // 1 2 3
+
+let arr = [1,2,3]
+console.log(Math.max(...arr))   // 3
+
+function foo(...rest){
+    console.log(rest)
+}
+
+foo(...arr)
+```
+
+* ES6에 도입된 스프레드문법 ...은 하나로 뭉쳐 있는 여러 값들의 집합을 개별적인 값들의 목록으로 만듬.
+* 여러 개의 값이 하나로 뭉쳐 있는 배열과 같은 이터러블을 펼쳐 개별적인 값들의 목록을 만듬.
+
+```js
+let concatArr = [...[1, 2], ...[3, 4]]
+console.log(concatArr)  // [1,2,3,4]
+```
+
+* ES5에서는 배열을 concat으로 결합하였으나 스프레드 문법을 사용하면 별도의 메서드 없이 결합 가능.
