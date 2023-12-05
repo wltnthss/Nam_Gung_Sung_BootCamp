@@ -17,3 +17,15 @@
 * element.style.css
 * element.setAttribute
 
+**DOM요소 생성**
+
+* document.createElement
+* document.createTextNode
+* element.innerHTML
+* element.textContent
+
+**DOM요소 삭제**
+
+* element.appendChild
+* element.removeChild
+* element.replaceChild
