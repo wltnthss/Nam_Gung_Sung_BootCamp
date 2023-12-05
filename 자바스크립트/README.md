@@ -361,6 +361,8 @@ foo(...arr)
 
 * ES6에 도입된 스프레드문법 ...은 하나로 뭉쳐 있는 여러 값들의 집합을 개별적인 값들의 목록으로 만듬.
 * 여러 개의 값이 하나로 뭉쳐 있는 배열과 같은 이터러블을 펼쳐 개별적인 값들의 목록을 만듬.
+* 이터러블이 아닌 일반 객체는 스프레드 문법의 대상이 될 수 없음.
+* 스프레드 문법의 결과는 값이 아님.
 
 ```js
 let concatArr = [...[1, 2], ...[3, 4]]
@@ -368,3 +370,83 @@ console.log(concatArr)  // [1,2,3,4]
 ```
 
 * ES5에서는 배열을 concat으로 결합하였으나 스프레드 문법을 사용하면 별도의 메서드 없이 결합 가능.
+
+```js
+// 배열 추가
+// ES5 splice 
+let arr1 = [1,2,3,8,9]
+let arr2 = [4,5,6,7]
+arr1.splice(2, 0, arr2)
+
+console.log(arr1)       // [1, 2, Array(4), 3, 8, 9]
+
+// ES6 splice 
+let es6Arr1 = [1,2,3,8,9]
+let es6Arr2 = [4,5,6,7]
+es6Arr1.splice(3, 0, ...es6Arr2)
+
+console.log(es6Arr1)    // [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+// 배열 복사
+// ES5 slice
+let arr1 = [1,2,3];
+let es5copy;
+
+es5copy = arr1.slice();
+console.log(es5copy)
+
+// ES6 slice
+let e6copy;
+
+e6copy = [...arr1];
+console.log(e6copy);
+
+```
+
+* 배열의 기존 요소를 삭제 또는 교체, 추가하여 원본 배열의 내용을 변경함.
+* ES5 에서 splice를 위와 같이 사용하면 배열안에 배열이 들어감.
+* 배열 중간에 다른 배열을 추가하거나 삭제할 때 splice와 스프레드 문법을 사용하자.
+
+```js
+// 유사 배열 객체 -> 배열 변경 
+let arrayLike = {
+    0: 1,
+    1: 2,
+    2: 3,
+    length: 3
+};
+
+// const arr = [...arrayLike]
+console.log(arrayLike)      // Object
+console.log(Array.from(arrayLike))  // Array
+```
+
+* 이터러블이 아닌 유사 배열 객체를 배열로 변경하려면 ES6에서부터 Array.from 메서드를 사용함.
+
+```js
+// 객체 내부 스프레드 문법 사용
+// 객체 복사(얕은 복사)
+let obj = { x: 1, y: 2}
+let copy = { ...obj }
+
+console.log(obj)
+console.log(copy)
+console.log(obj === copy)
+
+// 객체 병합
+let merged = { ...obj, ...{c : 3, d : 4} }
+console.log(merged)
+```
+
+* 스프레드 문법의 대상은 이터러블이어야 하지만 일반 객체를 대상으로도 사용이 가능함.
+* 얕은 복사이기에 비교 연산자는 false
+* 스프레드문법으로 객체를 병합하기전에는 Object.assign 메서드를 사용했음.
+
+
+**배열과 유사배열, DOM 요소 헷갈리는점**
+
+```js
+
+```
+
+
