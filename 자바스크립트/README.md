@@ -442,11 +442,60 @@ console.log(merged)
 * 얕은 복사이기에 비교 연산자는 false
 * 스프레드문법으로 객체를 병합하기전에는 Object.assign 메서드를 사용했음.
 
+**DOM 요소**
 
-**배열과 유사배열, DOM 요소 헷갈리는점**
+* document.getElementById
+* document.getElementsByTagName
+* document.getElementsByClassName
+* document.getElementsByName
+* document.getSelectorAll
+* document.querySelector
+
+**DOM요소 변경**
+
+* element.innerHTML
+* element.style.css
+* element.setAttribute
+
+**DOM요소 생성**
+
+* document.createElement
+* document.createTextNode
+* element.innerHTML
+* element.textContent 
+
+**DOM요소 삭제**
+
+* element.appendChild
+* element.removeChild
+* element.replaceChild
+  
 
 ```js
+// DOM document.getElementById
+let divId = document.getElementById('div')
+let ul = document.createElement('ul');
+let li = document.createElement('li');
+let text = document.createTextNode('Hello World')
 
+ul.appendChild(li);
+li.append(text)
+divId.appendChild(ul)
+
+// divId.onclick = clicked
+divId.addEventListener('click', clicked)
+
+function clicked(){
+    console.log('click!!!')
+    divId.remove();
+}
+
+// DOM document.getElementBytagName
 ```
+
+
+**배열과 유사배열**
+
+
 
 
