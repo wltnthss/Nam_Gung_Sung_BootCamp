@@ -448,7 +448,7 @@ console.log(merged)
 * document.getElementsByTagName
 * document.getElementsByClassName
 * document.getElementsByName
-* document.getSelectorAll
+* document.querySelectorAll
 * document.querySelector
 
 **DOM요소 변경**
@@ -470,6 +470,35 @@ console.log(merged)
 * element.removeChild
 * element.replaceChild
   
+```html
+    <div id="div">
+        
+    </div>
+
+    <div class="divs">
+        <div class="divs">
+            
+        </div>
+    </div>
+
+    <div name="divsname">
+        
+    </div>
+    
+    <div name="divsname">
+        
+    </div>
+
+    <ul>
+        <li>목록1</li>
+        <li>목록2</li>
+        <li>목록3</li>
+    </ul>
+
+    <span></span>
+    <span></span>
+    <p></p>
+```  
 
 ```js
 // DOM document.getElementById
@@ -491,11 +520,60 @@ function clicked(){
 }
 
 // DOM document.getElementBytagName
+let arr = []
+let liTag = document.getElementsByTagName('li')
+
+for(let i=0; i<liTag.length; i++){
+    let liTags = liTag[i].textContent;
+    arr.push(liTags)
+}
+
+// DOM document.querySelectorAll
+let querySelectAll = document.querySelectorAll('li')
+
+let arr2 = Array.from(querySelectAll)
+let arr3 = arr2.map(r => r.textContent) // 모든 li에 있는 text들 꺼내옴
 ```
+
+**HTMLCollection, NodeLIst**
+
+* DOM 요소를 다루다 dir 을 확인하다보니 HTMLCollection , NodeList 가 보여도 무지성으로 배열로 변경하여 사용하곤 했는데 정확한 의미를 알고싶어 정리하고자함.
+
+![Alt text](image-1.png)
+
+* getElementsByTagName, getElementsByClassName 는 HTMLCollection DOM 컬렉션 반환
+* querySelectorAll은 NodeList DOM 컬렉션 반환
+* HTMLCollection은 노드의 상태 변화를 실시간 감지, NodeList는 정적으로 관리
+* childNode가 리턴한 NodeList는 정적임이 보장되지 않음.
+* 따라서 HTMLCollection 이나 NodeList를 그대로 사용할 때는 Array로 치환하여 사용하면 좋음.
 
 
 **배열과 유사배열**
 
+* 위에서 알아본 HTMLCollection, NodeList 은 유사배열이고 array는 배열임.
+* 배열과 유사배열을 구분하는 이유는 유사배열의 경우는 배열의 메서드를 사용할 수 없기 때문임.
 
+```html
+let array = [1,2,3]
+let querySelectAll = document.querySelectorAll('li')
+let els = document.body.children
 
+console.log(querySelectAll) // NodeList
+console.log(els)    // Collection
 
+console.log(Array.isArray(array))   // true
+console.log(Array.isArray(querySelectAll))  // false
+console.log(Array.isArray(els)) // false
+
+// 배열
+array.forEach(n => {
+    console.log(n)
+})
+
+// 유사배열
+let array2 = [...querySelectAll]
+
+array2.forEach(e => {
+    console.log(e)
+})
+```
