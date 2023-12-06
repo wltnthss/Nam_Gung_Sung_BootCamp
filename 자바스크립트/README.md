@@ -163,6 +163,7 @@ var test2 = ""
 **함수**
 
 * 함수는 항상 값을 반환함.
+* 함수 선언문은 함수 이름을 생략할 수 없음.
 
 ```js
 var add = function(a,b) {
@@ -194,8 +195,124 @@ function findMax(a,b){
 }
 
 var result = findMax(2,6,4,7,1);
-console.log(result)
+console.log(result)0
 ```
+
+**스코프**
+
+* 모든 식별자는 자신이 선언된 위치에 의해 다른 코드가 식별자 자신을 참조할 수 있는 유효 범위가 결정됨.
+* js는 전역과 지역으로 나눌 수 있음.
+* 전역 변수는 어디서든지 참조할 수 있음.
+* 지역 변수는 자신의 지역 스코프와 하위 지역 스코프에서만 유효함.
+
+```js
+let x = 'global';
+function foo() {
+    let x = 'local'
+    console.log(x)  // local
+}
+foo();
+console.log(x)  // global
+```
+
+* **스코프가 계층적으로 연결된 것**이 스코프 체인인데 이 스코프 체인을 통해 상위 스코프 방향으로 이동하며 선언된 변수를 검색함.
+* 상위 스코프에서 유효한 변수는 하위 스코프에서 자유롭게 참조하지만 하위 스코프에서 유효한 변수를 상위 스코프에서는 참조할 수 없음.
+* 전역 변수의 무분별한 사용은 속도도 느리고 조심해야하며, 변수의 스코프는 좁을수록 좋음.
+
+
+**함수 레벨 스코프**
+
+```js
+var x = 1;
+if(true){
+    var x = 10;
+}
+console.log(x)  // 10
+
+let y = 1;
+if(true){
+    let y = 20;
+}
+console.log(y)  // 1
+```
+
+* 함수 레벨 스코프는 코드 블록이 아닌 함수에 의해서만 지역 스코프가 생성됨.
+* var 키워드로 선언된 변수는 오로지 함수의 코드 블록만을 지역 스코프로 인정함 이러한 특성을 함수 레벨 스코프라고함.
+
+```js
+let x = 1;
+
+function foo(){
+    let x = 10;
+    bar();
+}
+
+function bar(){
+    console.log(x);
+}
+
+foo();  // 1
+bar();  // 1
+```
+
+* 렉시컬 스코프를 따라 함수를 어디서 정의했는지에 따라 상위 스코프를 결정함.
+* 두 함수 모두 전역에서 생성되었으므로 x값은 1을 가짐.
+
+```js
+var x = 'global' 
+
+function foo(){
+    console.log(x);
+    var x = 'local'
+}
+
+foo();  // undefined
+console.log(x); // global
+```
+
+* 함수내에서 변수가 할당되기전에 선언먼저 했으므로 'undefined' 값이 출력이됨
+
+**let, const 키워드와 블록 레벨 스코프**
+
+* var, let, const 는 많이 들어왔지만 예제와 함께 한번 더 정리하고자함.
+
+```js
+// 1. var 변수 중복 허용
+var x = 1;
+var y = 1;
+var x = 100;
+
+console.log(x)  // 100
+console.log(y)  // 1
+```
+
+* var 키워드는 중복 선언이 가능하므로 중복 선언하면 먼저 선언된 변수 값이 변경됨.
+
+```js
+// 2. var 함수 레벨 스코프
+var i = 100;
+
+for(var i=0; i<5; i++){
+    
+}
+console.log(i);     // 5
+```
+
+* var 키워드는 함수레벨의 스코프에서만 동작하기에 if, for문에서는 전역 변수로써 동작해서 값이 이상해질 수가 있음.
+
+```js
+// 3. var 변수 호이스팅
+console.log(foo)    // undefined
+foo = 123;
+console.log(foo);   // 123
+var foo;
+```
+
+* var 키워드로 변수를 선언하면 변수 호이스팅에 의해 선언문 이전에 참조하여 결과가 undefined 가 나옴.
+* let은 var와 달리 중복 선언을 허용하지 않고, 함수 레벨 스코프가 아닌 블록 레벨 스코프를 따름.
+* let은 선언 단계와 초기화 단계가 분리되어 진행됨.
+* const 키워드는 반드시 선언과 동시에 초기화하고, 재할당이 안됨.
+
 
 **클로져**
 
