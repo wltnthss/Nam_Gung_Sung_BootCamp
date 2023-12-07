@@ -313,6 +313,48 @@ var foo;
 * let은 선언 단계와 초기화 단계가 분리되어 진행됨.
 * const 키워드는 반드시 선언과 동시에 초기화하고, 재할당이 안됨.
 
+**생성자 함수에 의한 객체 생성**
+
+```js
+// Object 생성자 함수 사용
+let person = new Object();
+
+person.name = 'Park';
+person.sayHi = function(){
+    console.log('Hi! my name is ' + this.name)
+}
+
+// 객체 리터럴 생성자 함수 사용
+let person2 = {
+    name : 'Lee',
+    sayHello(){
+        console.log('Hello! my name is ' + this.name)
+    }
+    // sayHello : function sayHello() { console.log(this.name) }
+}
+
+person.sayHi();     // Hi! my name is Park
+person2.sayHello(); // Hello! my name is Lee
+```
+
+* Object 생성자 함수를 사용하여 객체를 생성하는 방식도 있지만 객체 리터럴을 사용하는 것이 더 간편함.
+* 하지만 객체 리터럴 함수는 필요할 때마다 생성해야하므로 비효율적임
+* 이 때는 생성자 함수를 이용해서 객체를 생성하면 간편하게 생성 가능함.
+
+```js
+// 생성자 함수를 사용한 객체 생성
+function Circle(r){
+    this.r = r;
+    this.getWidth = function() {
+        return Math.PI * 2 * this.r;
+    }
+}
+let circle1 = new Circle(5);
+let circle2 = new Circle(10);
+
+console.log(circle1.getWidth()) // 31.4
+console.log(circle2.getWidth()) // 62.8
+```
 
 **클로져**
 
