@@ -670,7 +670,7 @@ let arr3 = arr2.map(r => r.textContent) // 모든 li에 있는 text들 꺼내옴
 * 위에서 알아본 HTMLCollection, NodeList 은 유사배열이고 array는 배열임.
 * 배열과 유사배열을 구분하는 이유는 유사배열의 경우는 배열의 메서드를 사용할 수 없기 때문임.
 
-```html
+```js
 let array = [1,2,3]
 let querySelectAll = document.querySelectorAll('li')
 let els = document.body.children
