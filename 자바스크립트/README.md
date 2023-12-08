@@ -736,3 +736,11 @@ array2.forEach(e => {
     console.log(e)
 })
 ```
+
+**클래스 제어**
+
+```js
+x.classList.toggle("change")    // 클릭 시 change 클래스 생성, 제거
+```
+
+* toggle은 클래스의 유무를 체크해서 없으면 add, 있으면 remove를 자동으로 시켜줌.
