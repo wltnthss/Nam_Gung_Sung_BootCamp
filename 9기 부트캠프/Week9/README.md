@@ -35,6 +35,8 @@
 
 ## JSP 상대경로 절대경로
 
+**JSP 상대경로 절대경로**
+
 * 상대경로 : 현 파일 위치 기준으로 목적지까지의 상대적인 경로
 * 절대경로 : 처음부터 시작하여 목적지까지의 절대적인 경로 / 로 시작함.
 
@@ -58,6 +60,56 @@ ${request.contextPath()}/js/chart/Chart.js
 
 ## JSP 핵심 명령어
 
+**JSP 태그**
+
+```java
+<%--  --%>  // 주석
+<%@  %>     // 지시자 - 페이지 속성 지정
+
+<%@page import="java.util.Arrays"%>
+```
+
+* 지시자는 JSP 페이지가 컨테이너에게 필요한 메세지를 보내기 위한 태그임.
+* page, include, taglib를 주로 사용함.
+* 범위는 JSP 파일 전체를 포함함.
+
+```java
+<%!  %>     // 변수, 메서드 선언
+<%  %>      // 스크립트릿 java 코드 삽입
+
+<%! 
+public int sum(int a, int b) {
+    return a + b;
+}
+%>
+<%
+a = 10;
+b = 20;
+out.println(sum(a, b));
+%>
+```
+
+* 선언 차이는 크게 다른 점은 없으나, 메서드를 작성할 수 있다는 점에서 차이가 있음.
+
+```java
+<%=  %>     // 결과값 출력
+
+<%= sum(a,b) %>
+```
+
+* 변수 또는 메서드의 결과값을 출력할 때 사용함.
+
+```java
+<jsp:action></jsp:action>   // 페이지 삽입, 공유, 자바빈 사용
+
+<jsp:include> : 다른 페이지의 실행 결과를 현재 페이지에 포함시켜줌
+<jsp:forward> : 페이지 간의 제어를 이동시켜줌
+<jsp:useBean> : 자바빈(java bean)을 페이지에서 사용할 수 있게 해줌
+<jsp:setProperty> : Property 값을 세팅할 때 사용
+<jsp:getProperty> : Property 값을 가져올 때 사용
+<jsp:param> : include, forward 안에서 사용되며, 인자를 추가할 때 사용
+```
+
 ## Cookie, Session
 
 **쿠키**
@@ -70,7 +122,12 @@ ${request.contextPath()}/js/chart/Chart.js
 4. 서버 다중화 유리
 
 ```java
+Cookie cookie = new Cookie("id", "text");   // 쿠키에 name, value로 id, text를 생성함.
+cookie.setMaxAge(60*60)     // 1시간동안 유효
+cookie.setMaxAge(0)         // 0으로 설정시 삭제
+response.addCookie(cookie)  // response 객체에 cookie 객체 탑재
 
+Cookie[] cookies = request.getCookies();    // 쿠키를 읽어와서 얻을 수 있음.
 ```
 
 **세션**
@@ -84,5 +141,15 @@ ${request.contextPath()}/js/chart/Chart.js
 4. 서버 다중화 불리
 
 ```java
+session.setAttribute("SessionName", "SessionData"); // 세션 생성
+session.setAttribute("Num", 123);
 
+Object obj1 = session.getAttribute("SessionName");  // 세션 값 얻어오기
+String SessionName = (String)obj1;        
+
+Object obj2 = session.getAttribute("Num");
+Integer Num = (Integer)obj2;
+
+session.removeAttribute("SessionName"); // 특정 세션 삭제
+session.invalidate(); // 모든세션삭제
 ```
