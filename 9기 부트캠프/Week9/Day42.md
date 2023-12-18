@@ -28,4 +28,5 @@ class Hello extends HttpServlet{
 * response.setContentType("text/html; charset=UTF-8");
 * request.setCharacterEncoding("utf-8");
 * Tomcat -> server.xml -> URIEncoding="UTF-8" 추가
-
+* accept-charset="utf-8" (form 태그 안에 넣음)
+* https://carrotweb.tistory.com/11 참고 URL
