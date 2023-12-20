@@ -1,4 +1,4 @@
-#Day46
+# Day46
 
 ## JDBC
 
@@ -12,7 +12,7 @@
 6. Statement 종료
 7. 데이터베이스 커넥션 종료
 
-##JSP
+## JSP
 
 **JSP**
 
