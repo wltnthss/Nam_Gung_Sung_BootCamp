@@ -116,3 +116,167 @@ white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
 ```
+
+**직접 만든 로그인 참고**
+
+* CSS 파일은 한 군데에서 관리
+
+```css
+@charset "UTF-8";
+
+/*LoginForm*/
+*{
+	margin: 0;
+	padding: 0;
+	font-size: 15px;	
+	font-family:  fonPretendard Variable,Noto Sans KR,Apple SD Gothic Neo,맑은 고딕,Malgun Gothic,sans-serif;
+}
+body{
+	height: 100%;
+}
+.loginMainLayout{
+	display: flex;
+	flex-direction: column;
+	padding: 50px 0;
+}
+.loginLayout{
+	margin: 0 auto;
+	align-items: center;
+	text-align: center;
+	max-width: 300px;
+	padding: 40px 0;
+}
+.loginImg{
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+.loginForm{
+	width: 300px;
+}
+.loginInput{
+	width: 100%;
+	padding: 10px 12px 10px;
+	border: 1px solid #dbdbdb;
+	color: gray;
+	box-sizing: border-box;
+}
+.loginBtn{
+	max-width: 300px;
+	width: 100%;
+	padding: 15px 10px;
+	margin: 20px 0;
+	border: 1px solid transparent;
+	font-size: 17px;
+	font-weight: bold;
+	background-color: deepskyblue;
+	color: white;
+	cursor: pointer;
+}
+.loginSection{
+	cursor: pointer;
+	text-align: center;
+}
+.loginSNSText{
+	margin: 30px 0 15px;
+	font-size: 14px;
+}
+.loginSNSImg{
+	cursor: pointer;
+}
+a{
+	text-decoration: none;
+	color: inherit;
+	font-size: 14px;
+}
+.loginNoMemberText{
+	margin: 40px 0 10px;
+	cursor: pointer;
+}
+.loginFooterLayout{
+	text-align: center;
+	font-family: sans-serif;
+	color: #757575;
+    font-size: 11px;
+    margin: -5px 0 25px;
+    box-sizing: border-box;
+    height: 20px;
+ 	position : relative;
+ 	margin-top: 175px;
+}
+
+/*RegisterForm*/
+
+```
+
+```jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="css/Style.css">
+</head>
+<body>
+
+	<!-- 전체 컨테이너 layout -->
+	<div class="loginMainLayout">
+		<div class="loginLayout">
+			<img alt="이미지가 없습니다." class="loginImg" src="img/shop.png" width="100" height="100">
+			<form action="" class="loginForm">
+				<div class="loginItem idForm">
+					<input type="text" placeholder="아이디" class="loginInput">
+				</div>
+				<div class="loginItem pwdForm">
+					<input type="password" placeholder="비밀번호" class="loginInput">
+				</div>
+				<input type="submit" value="로그인" class="loginBtn">
+			</form>
+			<section class="loginSection">
+				<a href="#" class="loginSections">비밀번호 재설정</a>
+				<a href="Register.jsp" class="loginSections">회원가입</a>
+			</section>
+			<section class="loginSNS">
+				<div class="loginSNSText">
+					SNS계정으로 간편 로그인/회원가입
+				</div>
+				<img alt="이미지가 없습니다." src="img/kakao.png" width="50px" class="loginSNSImg">
+				<img alt="이미지가 없습니다." src="img/naver.png" width="50px" class="loginSNSImg">
+			</section>
+			<section class="loginNoMember">
+				<div class="loginNoMemberText">
+					비회원 주문 조회하기
+				</div>
+			</section>
+		</div>
+		<footer class="loginFooterLayout">
+			<jsp:include page="module/Footer.jsp"/>
+		</footer>
+	</div>
+</body>
+</html>
+```
+
+* Footer.jsp
+
+```jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+@bucketplace, Co., Ltd.
+</body>
+</html>
+```
+
+**직접 만든 회원가입 참고**
+
+**직접 만든 홈페이지 레이아웃 참고**
+
+**직접 만든 게시판참고**
